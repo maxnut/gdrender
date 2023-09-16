@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="File di origine">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="File di intestazione">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="File di risorse">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="File di origine\ext">
+      <UniqueIdentifier>{32bf9d51-31de-4358-94c3-fed50f6b694a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di risorse\ext">
+      <UniqueIdentifier>{7962b7e3-3bb0-4085-96c5-d081ac96f30d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di risorse\actions">
+      <UniqueIdentifier>{3f5707ec-57fe-45be-8fbe-70b4b1d5ae98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\actions">
+      <UniqueIdentifier>{d522b3a3-bb7c-498c-91ab-08a0688b6e0b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ImageLoader.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Level.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="pugixml.cpp">
+      <Filter>File di origine\ext</Filter>
+    </ClCompile>
+    <ClCompile Include="PlistDate.cpp">
+      <Filter>File di origine\ext</Filter>
+    </ClCompile>
+    <ClCompile Include="Plist.cpp">
+      <Filter>File di origine\ext</Filter>
+    </ClCompile>
+    <ClCompile Include="Common.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Batcher.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Layer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="GameLayer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorChannel.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="base64.cpp">
+      <Filter>File di origine\ext</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionInterval.cpp">
+      <Filter>File di origine\actions</Filter>
+    </ClCompile>
+    <ClCompile Include="Tween.cpp">
+      <Filter>File di origine\actions</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionEasing.cpp">
+      <Filter>File di origine\actions</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorAction.cpp">
+      <Filter>File di origine\actions</Filter>
+    </ClCompile>
+    <ClCompile Include="EffectGameObject.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequence.cpp">
+      <Filter>File di origine\actions</Filter>
+    </ClCompile>
+    <ClCompile Include="PulseAction.cpp">
+      <Filter>File di origine\actions</Filter>
+    </ClCompile>
+    <ClCompile Include="Group.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="OpacityAction.cpp">
+      <Filter>File di origine\actions</Filter>
+    </ClCompile>
+    <ClCompile Include="HSV.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui-sfml\imgui-SFML.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_demo.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_draw.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_tables.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_widgets.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="CopyColorAction.cpp">
+      <Filter>File di origine\actions</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveAction.cpp">
+      <Filter>File di origine\actions</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioEngine.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="SpawnAction.cpp">
+      <Filter>File di origine\actions</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ImageLoader.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="base64.hpp">
+      <Filter>File di risorse\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="Plist.hpp">
+      <Filter>File di risorse\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="PlistDate.hpp">
+      <Filter>File di risorse\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="pugiconfig.hpp">
+      <Filter>File di risorse\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="pugixml.hpp">
+      <Filter>File di risorse\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="Batcher.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="GameLayer.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorChannel.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="base64.h">
+      <Filter>File di risorse\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="json.hpp">
+      <Filter>File di risorse\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionInterval.h">
+      <Filter>File di risorse\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="Tween.h">
+      <Filter>File di risorse\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionEasing.h">
+      <Filter>File di risorse\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorAction.h">
+      <Filter>File di risorse\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="EffectGameObject.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="LongData.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="Sequence.h">
+      <Filter>File di risorse\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="PulseAction.h">
+      <Filter>File di risorse\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="Group.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="OpacityAction.h">
+      <Filter>File di risorse\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="HSV.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="CopyColorAction.h">
+      <Filter>File di risorse\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveAction.h">
+      <Filter>File di risorse\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioEngine.h">
+      <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="SpawnAction.h">
+      <Filter>File di risorse\actions</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
