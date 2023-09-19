@@ -32,7 +32,8 @@ void ActionInterval::step(float dt)
 
     this->update(updateDt);
 
-    done = done ? true : elapsed >= duration;
+    if (elapsed >= duration || done)
+        this->stop();
 }
 
 void ActionInterval::stepNoUpdate(float dt)
@@ -47,10 +48,17 @@ void ActionInterval::stepNoUpdate(float dt)
         elapsed += dt;
     }
 
-    done = done ? true : elapsed >= duration;
+    if (elapsed >= duration || done)
+        this->stop();
 }
 
 void ActionInterval::update(float time)
 {
 	//std::cout << "Override me! " << time << " " << elapsed << std::endl;
+}
+
+void ActionInterval::stop()
+{
+    std::cout << "hello";
+    done = true;
 }

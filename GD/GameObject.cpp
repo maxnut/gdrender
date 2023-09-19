@@ -275,6 +275,18 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 		case 66:
 			effectPtr->detailOnly = Common::stoi(properties[i + 1]);
 			break;
+		case 68:
+			effectPtr->degrees = Common::stoi(properties[i + 1]);
+			break;
+		case 69:
+			effectPtr->times360 = Common::stoi(properties[i + 1]);
+			break;
+		case 70:
+			effectPtr->lockRotation = Common::stoi(properties[i + 1]);
+			break;
+		case 71:
+			effectPtr->secondaryTargetGroupId = Common::stoi(properties[i + 1]);
+			break;
 		case 85:
 			effectPtr->easeRate = Common::stof(properties[i + 1]);
 			break;
@@ -347,15 +359,34 @@ void GameObject::updatePosition()
 		return;
 
 	sf::Vector2f move = { 0, 0 };
+	float rotate = 0;
 	for (int i : groups)
 	{
 		move += GameLayer::instance->groups[i]->moveTotal;
 	}
 
-	if (move.x == 0 && move.y == 0)
-		return;
+	sf::Vector2f newPosition = startPosition + move + rotateOffset;
 
-	setPosition(startPosition + move);
+	for (int i : groups)
+	{
+		auto group = GameLayer::instance->groups[i];
+		rotate += group->rotateTotal;
+
+		if (group->rotateAround)
+		{
+			sf::Vector2f rotationPoint = group->rotateAround->getPosition();
+			float rotationAngle = group->rotateTotalMovement;
+			
+			sf::Transform transform;
+			transform.rotate(rotationAngle, rotationPoint);
+
+			newPosition += group->rotateAround->getPosition() - group->rotateAround->startPosition;
+			newPosition = transform.transformPoint(newPosition);
+		}
+	}
+
+	setPosition(newPosition);
+	setRotation(startRotation + rotate);
 
 	this->updateVerticesPosition();
 

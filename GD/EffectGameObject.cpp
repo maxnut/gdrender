@@ -17,8 +17,7 @@ void EffectGameObject::triggerActivated()
 		targetColorId = 1004;
 
 	auto gameLayer = GameLayer::instance;
-		
-
+	
 	switch (objectID)
 	{
 	case 29:
@@ -124,6 +123,20 @@ void EffectGameObject::triggerActivated()
 			return;
 
 		gameLayer->spawnActionsActive.push_back(SpawnAction::create(spawnDelay, gameLayer->groups[targetGroupId]));
+		break;
+	case 1346:
+	{
+		if (!gameLayer->groups.contains(targetGroupId))
+			return;
+
+		if (gameLayer->groups[targetGroupId]->rotateAction != nullptr)
+			gameLayer->groups[targetGroupId]->rotateAction->stop();
+
+		auto rotateAction = RotateAction::create(duration, targetGroupId, secondaryTargetGroupId, (360 * times360) + degrees, lockRotation);
+		auto ease = actionEasing(rotateAction, easeRate);
+		gameLayer->groups[targetGroupId]->rotateAction = ease;
+		gameLayer->rotateActionsActive.push_back(ease);
+	}
 		break;
 	}
 }

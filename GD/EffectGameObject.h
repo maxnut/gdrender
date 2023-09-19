@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GameObject.h"
-#include "ColorAction.h"
+#include "ActionInterval.h"
 
 class EffectGameObject : public GameObject
 {
@@ -9,16 +9,18 @@ public:
 	bool wasTriggerActivated, mainOnly, detailOnly, blending;
 	bool lockPlayerX, lockPlayerY;
 	bool activateGroup, spawnTriggered, multiActivate, touchTriggered;
+	bool lockRotation;
 
-	float duration;
+	float duration = 0.5f;
 	float easeRate = 1.f;
 	float fadeIn, hold, fadeOut;
 	float spawnDelay;
 
-	int targetColorId = 1, targetGroupId = 1;
+	int targetColorId = 1, targetGroupId = 1, secondaryTargetGroupId = 1;
 	int pulseMode, pulseType;
 	int easing = 0;
 	int copyColorID = -2;
+	int degrees, times360;
 
 	HSV copyColorHSV;
 

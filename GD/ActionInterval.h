@@ -15,6 +15,7 @@ public:
 	virtual void step(float dt);
 	virtual void stepNoUpdate(float dt);
 	virtual void update(float time);
+	virtual void stop();
 
 	virtual bool isDone()
 	{
@@ -24,10 +25,5 @@ public:
 	float getDuration()
 	{
 		return duration;
-	}
-
-	void stop()
-	{
-		done = true;
 	}
 };

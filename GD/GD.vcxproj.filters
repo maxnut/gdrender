@@ -132,6 +132,9 @@
     <ClCompile Include="SpawnAction.cpp">
       <Filter>File di origine\actions</Filter>
     </ClCompile>
+    <ClCompile Include="RotateAction.cpp">
+      <Filter>File di origine\actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageLoader.h">
@@ -228,6 +231,9 @@
       <Filter>File di risorse</Filter>
     </ClInclude>
     <ClInclude Include="SpawnAction.h">
+      <Filter>File di risorse\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="RotateAction.h">
       <Filter>File di risorse\actions</Filter>
     </ClInclude>
   </ItemGroup>

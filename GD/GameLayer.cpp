@@ -1,10 +1,11 @@
 #include "GameLayer.h"
 #include "Application.h"
-#include <cpr/cpr.h>
+
 #include "Common.h"
 #include "Level.h"
 #include "EffectGameObject.h"
 
+#include <cpr/cpr.h>
 #include <SFML/Audio.hpp>
 #include "imgui.h"
 
@@ -36,7 +37,7 @@ bool GameLayer::init()
     framerate.setFont(font);
     framerate.setCharacterSize(24);
 
-    loadLevel("89187968");//10565740 bloodbath 91946111 opengd 59075347 tartarus 52374843 zodiac 77292103 white space 89187968 edge of destiny 87665224 kocmoc 86084399 limbo 62152040 ocular miracle
+    loadLevel("91946111");//10565740 bloodbath 91946111 opengd 59075347 tartarus 52374843 zodiac 77292103 white space 89187968 edge of destiny 87665224 kocmoc 86084399 limbo 62152040 ocular miracle
 
     gameSheet01_t3 = Batcher::create("Resources\\GJ_GameSheet-uhd.png");
     if (!gameSheet01_t3)
@@ -183,6 +184,7 @@ void GameLayer::processColorActions()
     std::deque<std::shared_ptr<OpacityAction>> toRemoveOpacity;
     std::deque<std::shared_ptr<ActionInterval>> toRemoveMove;
     std::deque<std::shared_ptr<SpawnAction>> toRemoveSpawn;
+    std::deque<std::shared_ptr<ActionInterval>> toRemoveRotate;
 
     for (auto ac : colorActionsActive)
     {
@@ -232,6 +234,14 @@ void GameLayer::processColorActions()
             toRemoveSpawn.push_back(ac);
     }
 
+    for (auto ac : rotateActionsActive)
+    {
+        ac->step(Application::instance->deltaTime);
+
+        if (ac->isDone())
+            toRemoveRotate.push_back(ac);
+    }
+
     for (auto& ac : toRemoveColor)
         colorActionsActive.erase(std::find(colorActionsActive.begin(), colorActionsActive.end(), ac));
     
@@ -249,6 +259,9 @@ void GameLayer::processColorActions()
 
     for (auto& ac : toRemoveSpawn)
         spawnActionsActive.erase(std::find(spawnActionsActive.begin(), spawnActionsActive.end(), ac));
+
+    for (auto& ac : toRemoveRotate)
+        rotateActionsActive.erase(std::find(rotateActionsActive.begin(), rotateActionsActive.end(), ac));
 }
 
 void GameLayer::updateLevelColors()

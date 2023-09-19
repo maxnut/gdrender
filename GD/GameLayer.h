@@ -8,6 +8,7 @@
 #include "OpacityAction.h"
 #include "ColorAction.h"
 #include "CopyColorAction.h"
+#include "RotateAction.h"
 #include "MoveAction.h"
 #include "SpawnAction.h"
 #include "Group.h"
@@ -65,6 +66,7 @@ public:
 	std::vector<std::shared_ptr<OpacityAction>> opacityActionsActive;
 	std::vector<std::shared_ptr<ActionInterval>> moveActionsActive;
 	std::vector<std::shared_ptr<SpawnAction>> spawnActionsActive;
+	std::vector<std::shared_ptr<ActionInterval>> rotateActionsActive;
 	std::vector<int> dirtyChannels;
 	std::vector<int> dirtyGroups;
 
