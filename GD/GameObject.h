@@ -27,6 +27,7 @@ public:
 	float startRotation;
 public:
 	GameObject() : Sprite() {}
+
 	static std::shared_ptr<GameObject> createFromString(std::string_view str);
 
 	void setupCustomObjects(nlohmann::json& objectJson, std::shared_ptr<GameObject> parent);

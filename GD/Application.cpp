@@ -1,11 +1,11 @@
 #include "Application.h"
-#include "GameLayer.h"
+#include "SelectLevelLayer.h"
 
 #include "imgui-SFML.h"
 #include "imgui.h"
 
 #define MULTITHREADING 0
-#define IMGUI 0
+#define IMGUI 1
 
 Application* Application::instance;
 
@@ -23,12 +23,17 @@ void Application::start()
     ImGui::SFML::Init(*window);
 
     ImGui::GetIO().Fonts->Clear();
-    ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arial.ttf", 12);
+    ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arial.ttf", 18);
     ImGui::SFML::UpdateFontTexture();
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.ScaleAllSizes(3.f);
+    style.WindowBorderSize = 0.0f;
+    style.WindowPadding = ImVec2(50.0f, 50.0f);
 #endif
 
-    std::shared_ptr<GameLayer> gameLayer = GameLayer::create();
-    pushLayer(gameLayer);
+    std::shared_ptr<SelectLevelLayer> layer = SelectLevelLayer::create();
+    pushLayer(layer);
 
 #if MULTITHREADING == 1
     sf::Thread thread(&Application::draw, this);

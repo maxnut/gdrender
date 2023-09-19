@@ -14,7 +14,7 @@ void GameObject::setupCustomObjects(nlohmann::json& objectJson, std::shared_ptr<
 	{
 		auto spr = Sprite::create(sprite["texture"]);
 
-		spr->parent = parent;
+		spr->parent = objectIndex;
 
 		sf::Vector2f flip = { sprite["flip_x"] ? -1.f : 1.f , sprite["flip_y"] ? -1.f : 1.f };
 
@@ -35,19 +35,19 @@ void GameObject::setupCustomObjects(nlohmann::json& objectJson, std::shared_ptr<
 		{
 			if (sprite["color_type"] == "Base" || objectJson.contains("swap_base_detail") && sprite["color_type"] == "Detail" && objectJson["swap_base_detail"])
 			{
-				spr->channel = GameLayer::instance->colorChannels[primaryColorChannel];
+				spr->channel = GameLayer::instance->colorChannels[primaryColorChannel].get();
 				spr->hsvModifier = &primaryHSV;
 				spr->channelType = 1;
 			}
 			else if (sprite["color_type"] == "Detail")
 			{
-				spr->channel = GameLayer::instance->colorChannels[secondaryColorChannel];
+				spr->channel = GameLayer::instance->colorChannels[secondaryColorChannel].get();
 				spr->hsvModifier = &secondaryHSV;
 				spr->channelType = 2;
 			}
 			else
 			{
-				spr->channel = GameLayer::instance->colorChannels[1010];
+				spr->channel = GameLayer::instance->colorChannels[1010].get();
 				spr->channelType = 0;
 			}
 		}
@@ -104,6 +104,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 		return nullptr;
 
 	ptr->objectID = objID;
+	ptr->objectIndex = GameLayer::instance->objects.size();
 
 	ptr->zLayer = objectEntry["default_z_layer"];
 	if(objectEntry.contains("default_base_color_channel"))
@@ -306,24 +307,26 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 	{
 		if (objectEntry["color_type"] == "Base" || objectEntry.contains("swap_base_detail") && objectEntry["color_type"] == "Detail" && objectEntry["swap_base_detail"])
 		{
-			ptr->channel = GameLayer::instance->colorChannels[ptr->primaryColorChannel];
+			ptr->channel = GameLayer::instance->colorChannels[ptr->primaryColorChannel].get();
 			ptr->hsvModifier = &ptr->primaryHSV;
 			ptr->channelType = 1;
 		}
 		else if (objectEntry["color_type"] == "Detail")
 		{
-			ptr->channel = GameLayer::instance->colorChannels[ptr->secondaryColorChannel];
+			ptr->channel = GameLayer::instance->colorChannels[ptr->secondaryColorChannel].get();
 			ptr->hsvModifier = &ptr->secondaryHSV;
 			ptr->channelType = 2;
 		}
 		else
 		{
-			ptr->channel = GameLayer::instance->colorChannels[1010];
+			ptr->channel = GameLayer::instance->colorChannels[1010].get();
 			ptr->channelType = 0;
 		}
 	}
 
-	ptr->parent = ptr;
+	ptr->parent = ptr->objectIndex;
+
+	GameLayer::instance->objects.push_back(ptr);
 
 	ptr->addToChannelSection();
 	

@@ -4,6 +4,8 @@
 #include "ImageLoader.h"
 #include "HSV.h"
 
+#include <iostream>
+
 class GameObject;
 
 class ColorChannel;
@@ -22,8 +24,8 @@ public:
     sf::Vector2f anchor = { 0, 0 }, half = { 0, 0 };
 
     TextureDefinition* texDef;
-    std::shared_ptr<ColorChannel> channel;
-    std::shared_ptr<GameObject> parent;
+    ColorChannel* channel;
+    int parent;
     Batcher* currentBatcher = nullptr;
     HSV* hsvModifier = nullptr;
 
@@ -35,16 +37,9 @@ public:
     bool pendRemove = false;
 
     float opacityMultiplier = 1.0f;
-protected:
-    Sprite() {
-        vertices[0].position = sf::Vector2f(-50, -50);
-        vertices[1].position = sf::Vector2f(50, -50);
-        vertices[2].position = sf::Vector2f(50, 50);
-        vertices[3].position = sf::Vector2f(-50, 50);
-
-        texDef = nullptr;
-    }
 public:
+
+    Sprite() {}
 
     static std::shared_ptr<Sprite> create(std::string texture);
     bool init(std::string texture);

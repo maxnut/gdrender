@@ -135,6 +135,9 @@
     <ClCompile Include="RotateAction.cpp">
       <Filter>File di origine\actions</Filter>
     </ClCompile>
+    <ClCompile Include="SelectLevelLayer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageLoader.h">
@@ -235,6 +238,9 @@
     </ClInclude>
     <ClInclude Include="RotateAction.h">
       <Filter>File di risorse\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectLevelLayer.h">
+      <Filter>File di risorse</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

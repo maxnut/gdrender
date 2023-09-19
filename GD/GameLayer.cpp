@@ -9,27 +9,24 @@
 #include <SFML/Audio.hpp>
 #include "imgui.h"
 
+#include "SelectLevelLayer.h"
+
 GameLayer* GameLayer::instance;
 
-std::shared_ptr<GameLayer> GameLayer::create()
+std::shared_ptr<GameLayer> GameLayer::create(int levelID)
 {
 	std::shared_ptr<GameLayer> ptr(new GameLayer);
 
-	if (ptr->init())
+	if (ptr->init(levelID))
 		return ptr;
 
 	return nullptr;
 }
 
-bool GameLayer::init()
+bool GameLayer::init(int levelID)
 {
     camera = sf::View(sf::FloatRect(-900.f, -500.f, 1920, 1080));
     //camera.zoom(0.3f);
-
-    ImageLoader::ParsePlist("Resources\\GJ_GameSheet-uhd.plist");
-    ImageLoader::ParsePlist("Resources\\GJ_GameSheet02-uhd.plist");
-    ImageLoader::ParsePlist("Resources\\GJ_GameSheet03-uhd.plist");
-    ImageLoader::ParsePlist("Resources\\GJ_GameSheet04-uhd.plist");
 
     instance = this;
 
@@ -37,7 +34,7 @@ bool GameLayer::init()
     framerate.setFont(font);
     framerate.setCharacterSize(24);
 
-    loadLevel("91946111");//10565740 bloodbath 91946111 opengd 59075347 tartarus 52374843 zodiac 77292103 white space 89187968 edge of destiny 87665224 kocmoc 86084399 limbo 62152040 ocular miracle
+    loadLevel(std::to_string(levelID));//10565740 bloodbath 91946111 opengd 59075347 tartarus 52374843 zodiac 77292103 white space 89187968 edge of destiny 87665224 kocmoc 86084399 limbo 62152040 ocular miracle
 
     gameSheet01_t3 = Batcher::create("Resources\\GJ_GameSheet-uhd.png");
     if (!gameSheet01_t3)
@@ -90,6 +87,12 @@ bool GameLayer::init()
 void GameLayer::update()
 {
     Application* app = Application::instance;
+
+    if (Application::instance->keyPressedMap[sf::Keyboard::Escape])
+    {
+        std::shared_ptr<SelectLevelLayer> layer = SelectLevelLayer::create();
+        app->pushLayer(layer);
+    }
 
     if (app->keyPressedMap[sf::Keyboard::P])
         startTimer = 0;
@@ -619,11 +622,6 @@ void GameLayer::setupObjects(std::string_view levelString)
     for (const auto& objectDataSpecific : objData)
     {
         auto obj = GameObject::createFromString(objectDataSpecific);
-        if (obj)
-        {
-            objects.push_back(obj);
-            obj->objectIndex = objects.size() - 1;
-        }
     }
 }
 
@@ -755,7 +753,7 @@ void GameLayer::layerObject(std::shared_ptr<Sprite> sprite)
     bool blending = sprite->channel && sprite->channel->blending;
     if (sprite->texDef->sheet == "Resources\\GJ_GameSheet-uhd.png")
     {
-        switch (sprite->parent->zLayer)
+        switch (objects[sprite->parent]->zLayer)
         {
         case -3:
             targetBatcher = blending ? gameSheet01_b4_blending.get() : gameSheet01_b4.get();

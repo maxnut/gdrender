@@ -59,6 +59,5 @@ void ActionInterval::update(float time)
 
 void ActionInterval::stop()
 {
-    std::cout << "hello";
     done = true;
 }

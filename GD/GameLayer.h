@@ -34,6 +34,7 @@ private:
 	bool move = true;
 
 	int frame_count;
+	int levelID = 1;
 
 	int bgID = 1;
 public:
@@ -89,9 +90,9 @@ public:
 	static GameLayer* instance;
 
 public:
-	static std::shared_ptr<GameLayer> create();
+	static std::shared_ptr<GameLayer> create(int levelID);
 
-	bool init() override;
+	bool init(int levelID);
 	void update() override;
 	void draw() override;
 

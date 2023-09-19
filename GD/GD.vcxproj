@@ -167,6 +167,7 @@
     <ClCompile Include="pugixml.cpp" />
     <ClCompile Include="PulseAction.cpp" />
     <ClCompile Include="RotateAction.cpp" />
+    <ClCompile Include="SelectLevelLayer.cpp" />
     <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="SpawnAction.cpp" />
     <ClCompile Include="Sprite.cpp" />
@@ -202,6 +203,7 @@
     <ClInclude Include="pugixml.hpp" />
     <ClInclude Include="PulseAction.h" />
     <ClInclude Include="RotateAction.h" />
+    <ClInclude Include="SelectLevelLayer.h" />
     <ClInclude Include="Sequence.h" />
     <ClInclude Include="SpawnAction.h" />
     <ClInclude Include="Sprite.h" />
