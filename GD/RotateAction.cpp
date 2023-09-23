@@ -41,6 +41,13 @@ bool RotateAction::init(float duration, int target, int center, float rotation, 
 
     this->targetGroup = GameLayer::instance->groups[target].get();
     this->centerGroup = GameLayer::instance->groups[center == 0 ? target : center].get();
+
+    if (!centerGroup)
+        centerGroup = targetGroup;
+
+    if (!centerGroup)
+        return false;
+
     this->rotateTotal = rotation;
     this->groupID = target;
     this->lockRotation = lock;

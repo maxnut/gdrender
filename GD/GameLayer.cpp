@@ -73,8 +73,6 @@ bool GameLayer::init(int levelID)
 
         CoTaskMemFree(localAppDataPath);
 
-        std::cout << localAppDataPathStr << std::endl;
-
         ss << localAppDataPathStr << "\\GeometryDash\\";
         ss << songID;
         ss << ".mp3";
@@ -239,10 +237,13 @@ void GameLayer::processColorActions()
 
     for (auto ac : moveActionsActive)
     {
-        ac->step(Application::instance->deltaTime);
+        if (ac)
+        {
+            ac->step(Application::instance->deltaTime);
 
-        if (ac->isDone())
-            toRemoveMove.push_back(ac);
+            if (ac->isDone())
+                toRemoveMove.push_back(ac);
+        }
     }
 
     for (auto ac : spawnActionsActive)
@@ -583,7 +584,7 @@ void GameLayer::setupLevel(std::string_view levelString)
         }
         if (levelData[i] == "kA1")
         {
-            std::cout << Common::stoi(levelData[i + 1]);
+            //std::cout << Common::stoi(levelData[i + 1]);
         }
         else if (levelData[i] == "kA13")
         {

@@ -120,10 +120,14 @@ void EffectGameObject::triggerActivated()
 		}
 		break;
 	case 1268:
+	{
 		if (!gameLayer->groups.contains(targetGroupId))
 			return;
 
-		gameLayer->spawnActionsActive.push_back(SpawnAction::create(spawnDelay, gameLayer->groups[targetGroupId]));
+		auto ac = SpawnAction::create(spawnDelay, gameLayer->groups[targetGroupId]);
+		if (ac)
+			gameLayer->spawnActionsActive.push_back(ac);
+	}
 		break;
 	case 1346:
 	{
@@ -134,6 +138,8 @@ void EffectGameObject::triggerActivated()
 			gameLayer->groups[targetGroupId]->rotateAction->stop();
 
 		auto rotateAction = RotateAction::create(duration, targetGroupId, secondaryTargetGroupId, (360 * times360) + degrees, lockRotation);
+		if (!rotateAction)
+			return;
 		auto ease = actionEasing(rotateAction, easeRate);
 		gameLayer->groups[targetGroupId]->rotateAction = ease;
 		gameLayer->rotateActionsActive.push_back(ease);
