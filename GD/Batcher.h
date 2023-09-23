@@ -11,7 +11,7 @@ private:
     
     sf::Texture* texture;
 
-    std::vector<std::shared_ptr<Sprite>> sprites;
+    std::vector<Sprite*> sprites;
 
     sf::BlendMode blendMode;
 public:
@@ -19,7 +19,7 @@ public:
 private:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 public:
-    void addSprite(std::shared_ptr<Sprite> sp);
+    void addSprite(Sprite* sp);
 
     void removeSprite(Sprite* sp);
 

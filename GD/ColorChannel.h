@@ -16,10 +16,10 @@ private:
 public:
 	bool blending = false;
 
-	std::unordered_map<int, std::unordered_map<int, std::shared_ptr<Sprite>>> channelSprites;
-	std::shared_ptr<ActionInterval> colorActionChannel;
-	std::shared_ptr<ColorChannel> copyColor = nullptr;
-	std::vector<std::shared_ptr<ColorChannel>> copiers;
+	std::unordered_map<int, std::unordered_map<int, Sprite*>> channelSprites;
+	std::shared_ptr <ActionInterval> colorActionChannel;
+	ColorChannel* copyColor = nullptr;
+	std::vector<ColorChannel*> copiers;
 
 	int id;
 

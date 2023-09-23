@@ -18,22 +18,20 @@ bool SpawnAction::init(float duration, std::shared_ptr<Group> group)
 	return true;
 }
 
-void SpawnAction::step(float dt)
+void SpawnAction::stop()
 {
-	ActionInterval::step(dt);
-	if (done)
+	ActionInterval::stop();
+
+	for (auto pair : group->objects)
 	{
-		for (auto pair : group->objects)
+		for (auto pair2 : pair.second)
 		{
-			for (auto pair2 : pair.second) 
+			auto obj = pair2.second;
+			if (obj->isTrigger)
 			{
-				auto obj = pair2.second;
-				if (obj->isTrigger)
-				{
-					auto trigger = std::dynamic_pointer_cast<EffectGameObject>(obj);
-					if (trigger->spawnTriggered)
-						trigger->triggerActivated();
-				}
+				auto trigger = dynamic_cast<EffectGameObject*>(obj);
+				if (trigger->spawnTriggered)
+					trigger->triggerActivated();
 			}
 		}
 	}

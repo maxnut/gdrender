@@ -28,16 +28,14 @@ bool PulseAction::init(float fadein, float hold, float fadeout, int target, sf::
 	this->deltar = static_cast<float>(to.r - from.r);
 	this->deltag = static_cast<float>(to.g - from.g);
 	this->deltab = static_cast<float>(to.b - from.b);
-	this->deltaa = static_cast<float>(to.a - from.a);
 
 	this->deltar2 = static_cast<float>(original.r - to.r);
 	this->deltag2 = static_cast<float>(original.g - to.g);
 	this->deltab2 = static_cast<float>(original.b - to.b);
-	this->deltaa2 = static_cast<float>(original.a - to.a);
 	return true;
 }
 
-void PulseAction::applyToSpriteIn(std::shared_ptr<Sprite> spr, float fadetime)
+void PulseAction::applyToSpriteIn(Sprite* spr, float fadetime)
 {
 	if (spr->channelType == 1 && detailOnly || spr->channelType == 2 && mainOnly || spr->channelType == 0)
 		return;
@@ -48,7 +46,7 @@ void PulseAction::applyToSpriteIn(std::shared_ptr<Sprite> spr, float fadetime)
 	spr->setColor({ r1, g1, b1 });
 }
 
-void PulseAction::applyToSpriteOut(std::shared_ptr<Sprite> spr, float fadetime)
+void PulseAction::applyToSpriteOut(Sprite* spr, float fadetime)
 {
 	if (spr->channelType == 1 && detailOnly || spr->channelType == 2 && mainOnly || spr->channelType == 0)
 		return;
@@ -72,8 +70,7 @@ void PulseAction::update(float time)
 			sf::Uint8 r = static_cast<sf::Uint8>(to.r - deltar * (1 - fadetime));
 			sf::Uint8 g = static_cast<sf::Uint8>(to.g - deltag * (1 - fadetime));
 			sf::Uint8 b = static_cast<sf::Uint8>(to.b - deltab * (1 - fadetime));
-			sf::Uint8 a = static_cast<sf::Uint8>(to.a - deltaa * (1 - fadetime));
-			channel->setColor({ r, g, b, a }, true);
+			channel->setColor({ r, g, b, channel->getColor().a }, true);
 			channel->setDirtyRecusively();
 		}
 		else if (time >= fadein + hold)
@@ -86,8 +83,7 @@ void PulseAction::update(float time)
 			sf::Uint8 r = static_cast<sf::Uint8>(original.r - deltar2 * (1 - fadetime));
 			sf::Uint8 g = static_cast<sf::Uint8>(original.g - deltag2 * (1 - fadetime));
 			sf::Uint8 b = static_cast<sf::Uint8>(original.b - deltab2 * (1 - fadetime));
-			sf::Uint8 a = static_cast<sf::Uint8>(original.a - deltaa2 * (1 - fadetime));
-			channel->setColor({ r, g, b, a }, true);
+			channel->setColor({ r, g, b, channel->getColor().a}, true);
 			channel->setDirtyRecusively();
 		}
 	}
@@ -107,7 +103,7 @@ void PulseAction::update(float time)
 					auto obj = pair.second;
 					applyToSpriteIn(obj, fadetime);
 					for (auto spr : obj->childSprites)
-						applyToSpriteIn(spr, fadetime);
+						applyToSpriteIn(spr.get(), fadetime);
 				}
 			}
 		}
@@ -124,7 +120,7 @@ void PulseAction::update(float time)
 					auto obj = pair.second;
 					applyToSpriteOut(obj, fadetime);
 					for (auto spr : obj->childSprites)
-						applyToSpriteOut(spr, fadetime);
+						applyToSpriteOut(spr.get(), fadetime);
 				}
 			}
 		}
@@ -138,7 +134,7 @@ void PulseAction::update(float time)
 					auto obj = pair.second;
 					applyToSpriteIn(obj, fadein + hold);
 					for (auto spr : obj->childSprites)
-						applyToSpriteIn(spr, fadein + hold);
+						applyToSpriteIn(spr.get(), fadein + hold);
 				}
 			}
 		}

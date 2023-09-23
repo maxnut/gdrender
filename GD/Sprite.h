@@ -25,7 +25,7 @@ public:
 
     TextureDefinition* texDef;
     ColorChannel* channel;
-    int parent;
+    GameObject* parent;
     Batcher* currentBatcher = nullptr;
     HSV* hsvModifier = nullptr;
 

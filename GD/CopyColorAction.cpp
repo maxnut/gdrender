@@ -1,7 +1,7 @@
 #include "CopyColorAction.h"
 #include "GameLayer.h"
 
-std::shared_ptr<CopyColorAction> CopyColorAction::create(float duration, std::shared_ptr<ColorChannel> target, std::shared_ptr<ColorChannel> copy, HSV hsvModifier, int colorChannelID)
+std::shared_ptr<CopyColorAction> CopyColorAction::create(float duration, ColorChannel* target, ColorChannel* copy, HSV hsvModifier, int colorChannelID)
 {
 	std::shared_ptr<CopyColorAction> ptr(new CopyColorAction);
 
@@ -11,7 +11,7 @@ std::shared_ptr<CopyColorAction> CopyColorAction::create(float duration, std::sh
 	return nullptr;
 }
 
-bool CopyColorAction::init(float duration, std::shared_ptr<ColorChannel> target, std::shared_ptr<ColorChannel> copy, HSV hsvModifier, int colorChannelID)
+bool CopyColorAction::init(float duration, ColorChannel* target, ColorChannel* copy, HSV hsvModifier, int colorChannelID)
 {
 	this->duration = duration;
 	this->targetChannel = target;

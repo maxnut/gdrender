@@ -7,6 +7,8 @@ class Application
 private:
 	std::shared_ptr<Layer> currentLayer;
 
+	std::shared_ptr<Layer> pendingLayer;
+
 	sf::Clock deltaClock;
 public:
 	std::map<sf::Keyboard::Key, bool> keyPressedMap;

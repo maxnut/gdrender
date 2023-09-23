@@ -60,7 +60,7 @@ public:
 	std::shared_ptr<AudioEngine> audioEngine;
 
 	std::vector<std::shared_ptr<GameObject>> objects;
-	std::vector<std::unordered_map<int, std::shared_ptr<GameObject>>> sectionObjects;
+	std::vector<std::unordered_map<int, GameObject*>> sectionObjects;
 	std::vector<std::shared_ptr<ColorAction>> colorActionsActive;
 	std::vector<std::shared_ptr<CopyColorAction>> copyColorActionsActive;
 	std::vector<std::shared_ptr<PulseAction>> pulseActionsActive;
@@ -77,7 +77,7 @@ public:
 	sf::Text framerate;
 	sf::Font font;
 
-	std::shared_ptr<Sprite> selected = nullptr;
+	Sprite* selected = nullptr;
 
 	int prevSection = 0, nextSection = 0;
 	int songID;
@@ -97,8 +97,8 @@ public:
 	void draw() override;
 
 	void drawImGui();
-	void drawForSprite(std::shared_ptr<Sprite> sprite, int index);
-	void drawForObject(std::shared_ptr<GameObject> object, int index);
+	void drawForSprite(Sprite* sprite, int index);
+	void drawForObject(GameObject* object, int index);
 	void drawInspector();
 
 	void onExit() override;
@@ -107,7 +107,7 @@ public:
 	void setupLevel(std::string_view levelStr);
 	void setupObjects(std::string_view levelStr);
 
-	void layerObject(std::shared_ptr<Sprite> sprite);
+	void layerObject(Sprite* sprite);
 
 	void updateSpeed(int speed);
 

@@ -4,10 +4,11 @@
 
 void EffectGameObject::triggerActivated()
 {
-	if (wasTriggerActivated && (!spawnTriggered || !multiActivate))
+	if(wasTriggerActivated)
 		return;
 
-	wasTriggerActivated = true;
+	if(!multiActivate && !spawnTriggered)
+		wasTriggerActivated = true;
 
 	if (objectID == 29)
 		targetColorId = 1000;
@@ -52,7 +53,7 @@ void EffectGameObject::triggerActivated()
 			if (gameLayer->colorChannels[targetColorId]->copyColor)
 			{
 				auto copiers = &gameLayer->colorChannels[targetColorId]->copyColor->copiers;
-				auto foundInd = std::find(copiers->begin(), copiers->end(), gameLayer->colorChannels[targetColorId]);
+				auto foundInd = std::find(copiers->begin(), copiers->end(), gameLayer->colorChannels[targetColorId].get());
 				if (foundInd != copiers->end())
 					copiers->erase(foundInd);
 
@@ -65,7 +66,7 @@ void EffectGameObject::triggerActivated()
 		{
 			if (!gameLayer->colorChannels[copyColorID])
 				return;
-			auto createdAction = CopyColorAction::create(duration, gameLayer->colorChannels[targetColorId], gameLayer->colorChannels[copyColorID], copyColorHSV, targetColorId);
+			auto createdAction = CopyColorAction::create(duration, gameLayer->colorChannels[targetColorId].get(), gameLayer->colorChannels[copyColorID].get(), copyColorHSV, targetColorId);
 			gameLayer->colorChannels[targetColorId]->colorActionChannel = createdAction;
 			gameLayer->copyColorActionsActive.push_back(createdAction);
 		}

@@ -53,6 +53,16 @@ void Application::start()
 
 void Application::update()
 {
+
+    if (pendingLayer)
+    {
+        if (currentLayer)
+            popLayer();
+
+        currentLayer = pendingLayer;
+        pendingLayer = nullptr;
+    }
+
     sf::Time dt = deltaClock.restart();
     deltaTime = dt.asSeconds();
 
@@ -127,10 +137,7 @@ void Application::onQuit()
 
 void Application::pushLayer(std::shared_ptr<Layer> layer)
 {
-    if (currentLayer)
-        popLayer();
-
-    currentLayer = layer;
+    pendingLayer = layer;
 }
 
 void Application::popLayer()

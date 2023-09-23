@@ -18,7 +18,7 @@ bool MoveAction::init(float duration, int target, sf::Vector2f movement, bool fo
 
 	this->groupID = target;
 	this->duration = duration;
-	this->targetGroup = GameLayer::instance->groups[target];
+	this->targetGroup = GameLayer::instance->groups[target].get();
 	this->moveTotal = movement;
 	this->followPlayerX = followX;
 	this->followPlayerY = followY;

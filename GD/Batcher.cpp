@@ -14,7 +14,7 @@ void Batcher::draw(sf::RenderTarget& target, sf::RenderStates states) const
     target.draw(vertices.data(), vertices.size(), sf::Quads, states);
 }
 
-void Batcher::addSprite(std::shared_ptr<Sprite> sp)
+void Batcher::addSprite(Sprite* sp)
 {
     if (sp->currentBatcher != nullptr)
         return;

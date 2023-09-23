@@ -14,7 +14,7 @@ void GameObject::setupCustomObjects(nlohmann::json& objectJson, std::shared_ptr<
 	{
 		auto spr = Sprite::create(sprite["texture"]);
 
-		spr->parent = objectIndex;
+		spr->parent = this;
 
 		sf::Vector2f flip = { sprite["flip_x"] ? -1.f : 1.f , sprite["flip_y"] ? -1.f : 1.f };
 
@@ -104,7 +104,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 		return nullptr;
 
 	ptr->objectID = objID;
-	ptr->objectIndex = GameLayer::instance->objects.size();
+	
 
 	ptr->zLayer = objectEntry["default_z_layer"];
 	if(objectEntry.contains("default_base_color_channel"))
@@ -117,6 +117,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 	for (size_t i = 0; i < properties.size() - 1; i += 2)
 	{
 		int key = Common::stoi(properties[i]);
+
 		switch (key)
 		{
 		case 2:
@@ -251,10 +252,10 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 
 				if (!GameLayer::instance->groups[group]->objects.contains(ptr->section))
 				{
-					std::unordered_map<int, std::shared_ptr<GameObject>> map;
+					std::unordered_map<int, GameObject*> map;
 					GameLayer::instance->groups[group]->objects.insert({ ptr->section, map });
 				}
-				GameLayer::instance->groups[group]->objects[ptr->section].insert({ ptr->uniqueID, ptr });
+				GameLayer::instance->groups[group]->objects[ptr->section].insert({ ptr->uniqueID, ptr.get()});
 			}
 			break;
 		}
@@ -291,7 +292,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 		case 85:
 			effectPtr->easeRate = Common::stof(properties[i + 1]);
 			break;
-		case 104:
+		case 87:
 			effectPtr->multiActivate = Common::stof(properties[i + 1]);
 			break;
 		}
@@ -324,9 +325,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 		}
 	}
 
-	ptr->parent = ptr->objectIndex;
-
-	GameLayer::instance->objects.push_back(ptr);
+	ptr->parent = ptr.get();
 
 	ptr->addToChannelSection();
 	
@@ -421,11 +420,11 @@ void GameObject::tryUpdateSection()
 		int sectionSize = GameLayer::instance->sectionObjects.size();
 		while (section >= sectionSize)
 		{
-			std::unordered_map<int, std::shared_ptr<GameObject>> map;
+			std::unordered_map<int, GameObject*> map;
 			GameLayer::instance->sectionObjects.push_back(map);
 			sectionSize++;
 		}
-		GameLayer::instance->sectionObjects[section].insert({ uniqueID, GameLayer::instance->objects[objectIndex] });
+		GameLayer::instance->sectionObjects[section].insert({ uniqueID, this });
 		this->section = section;
 
 		for (int i : groups)
@@ -437,10 +436,10 @@ void GameObject::tryUpdateSection()
 
 			if (!group->objects.contains(section))
 			{
-				std::unordered_map<int, std::shared_ptr<GameObject>> map;
+				std::unordered_map<int, GameObject*> map;
 				group->objects.insert({ section, map });
 			}
-			group->objects[section].insert({ uniqueID, GameLayer::instance->objects[objectIndex] });
+			group->objects[section].insert({ uniqueID, this });
 		}
 
 		addToChannelSection();

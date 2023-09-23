@@ -13,11 +13,9 @@ void Sprite::updateVerticesPosition() {
 
     sf::Transform combinedTransform = getTransform();
 
-    auto parentPtr = GameLayer::instance->objects[parent];
-
-    if (parentPtr && parentPtr.get() != this)
+    if (parent && parent != this)
     {
-        combinedTransform = parentPtr->getTransform() * getTransform();
+        combinedTransform = parent->getTransform() * getTransform();
     }
 
     for (int i = 0; i < 4; ++i) {
@@ -168,9 +166,7 @@ void Sprite::removeFromChannel()
     if (!channel)
         return;
 
-    auto parentPtr = GameLayer::instance->objects[parent];
-
-    auto map = &channel->channelSprites[parentPtr->section];
+    auto map = &channel->channelSprites[parent->section];
 
     map->erase(uniqueID);
 }
@@ -180,12 +176,10 @@ void Sprite::addToChannelSection()
     if (!channel)
         return;
 
-    auto parentPtr = GameLayer::instance->objects[parent];
-
-    if (!channel->channelSprites.contains(parentPtr->section))
+    if (!channel->channelSprites.contains(parent->section))
     {
-        std::unordered_map<int, std::shared_ptr<Sprite>> map;
-        channel->channelSprites.insert({ parentPtr->section, map });
+        std::unordered_map<int, Sprite*> map;
+        channel->channelSprites.insert({ parent->section, map });
     }
-    channel->channelSprites[parentPtr->section].insert({ uniqueID, parentPtr.get() == this ? parentPtr : parentPtr->childSprites[childIndex] });
+    channel->channelSprites[parent->section].insert({ uniqueID, this });
 }

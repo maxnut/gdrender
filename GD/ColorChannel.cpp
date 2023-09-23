@@ -20,7 +20,7 @@ void ColorChannel::setColor(sf::Color color, bool pulse)
 
 sf::Color ColorChannel::getColor()
 {
-	if(!copyColor.get())
+	if(!copyColor)
 		return color;
 	else
 	{
