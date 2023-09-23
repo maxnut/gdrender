@@ -751,6 +751,10 @@ void GameLayer::layerObject(std::shared_ptr<Sprite> sprite)
 
     Batcher* targetBatcher = nullptr;
     bool blending = sprite->channel && sprite->channel->blending;
+
+    if (sprite->channel && sprite->channel->id == 1010)
+        blending = colorChannels[objects[sprite->parent]->secondaryColorChannel]->blending;
+
     if (sprite->texDef->sheet == "Resources\\GJ_GameSheet-uhd.png")
     {
         switch (objects[sprite->parent]->zLayer)

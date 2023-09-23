@@ -18,6 +18,9 @@ bool ActionInterval::init(float duration)
 
 void ActionInterval::step(float dt)
 {
+    if (isDone())
+        return;
+
     if (firstTick)
     {
         firstTick = false;

@@ -1,5 +1,29 @@
-#include "RotateAction.h"
 #include "GameLayer.h"
+#include "RotateAction.h"
+
+void RotateAction::stop()
+{
+    ActionInterval::stop();
+
+    for (auto pair : targetGroup->objects)
+    {
+        for (auto pair2 : pair.second)
+        {
+            auto obj = pair2.second;
+            sf::Vector2f move = obj->startPosition;
+
+            for (int i : obj->groups)
+                move += GameLayer::instance->groups[i]->moveTotal;
+
+            obj->rotateOffsetMovement = obj->getPosition() - move;
+            obj->rotateOffset += targetGroup->rotateTotal;
+        }
+    }
+
+    targetGroup->rotateAround = nullptr;
+    targetGroup->rotateTotal = 0;
+    targetGroup->rotateTotalMovement = 0;
+}
 
 std::shared_ptr<RotateAction> RotateAction::create(float duration, int target, int center, float rotation, bool lock)
 {
@@ -59,25 +83,4 @@ void RotateAction::update(float time)
     auto dirty = &GameLayer::instance->dirtyGroups;
     if (std::find(dirty->begin(), dirty->end(), groupID) == dirty->end())
         dirty->push_back(groupID);
-}
-
-void RotateAction::stop()
-{
-    done = true;
-
-    std::cout << " yo";
-
-    for (auto pair : targetGroup->objects)
-    {
-        for (auto pair2 : pair.second)
-        {
-            auto obj = pair2.second;
-            sf::Vector2f move = obj->startPosition;
-
-            for (int i : obj->groups)
-                move += GameLayer::instance->groups[i]->moveTotal;
-
-            obj->rotateOffset = obj->getPosition() - move;
-        }
-    }
 }

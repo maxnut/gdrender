@@ -22,8 +22,9 @@ public:
 	std::vector<int> groups;
 
 	sf::Vector2f startPosition;
-	sf::Vector2f rotateOffset;
+	sf::Vector2f rotateOffsetMovement;
 
+	float rotateOffset;
 	float startRotation;
 public:
 	GameObject() : Sprite() {}

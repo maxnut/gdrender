@@ -12,6 +12,7 @@ public:
     bool init(std::shared_ptr<ActionInterval> inner);
 
     virtual void update(float time) override;
+    virtual void stop() override;
 };
 
 #define EASE_TEMPLATE_DECL_CLASS(CLASSNAME)               \

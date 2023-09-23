@@ -368,7 +368,7 @@ void GameObject::updatePosition()
 		move += GameLayer::instance->groups[i]->moveTotal;
 	}
 
-	sf::Vector2f newPosition = startPosition + move + rotateOffset;
+	sf::Vector2f newPosition = startPosition + rotateOffsetMovement;
 
 	for (int i : groups)
 	{
@@ -388,7 +388,9 @@ void GameObject::updatePosition()
 		}
 	}
 
-	setPosition(newPosition);
+	rotate += rotateOffset;
+
+	setPosition(newPosition + move);
 	setRotation(startRotation + rotate);
 
 	this->updateVerticesPosition();

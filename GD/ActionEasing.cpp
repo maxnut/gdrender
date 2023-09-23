@@ -18,6 +18,12 @@ bool ActionEasing::init(std::shared_ptr<ActionInterval> inner)
     return true;
 }
 
+void ActionEasing::stop()
+{
+    ActionInterval::stop();
+    innerAction->stop();
+}
+
 void ActionEasing::update(float time)
 {
 	innerAction->update(time);
