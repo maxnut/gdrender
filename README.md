@@ -2,7 +2,7 @@
 Trying to render Geometry Dash levels correctly.
 
 # Usage
-Download the latest release from the [releases](github.com/maxnut/gdrender/releases/latest) tab.
+Download the latest release from the [releases](github.com/maxnut/gdrender/releases/latest) tab. Drag the _Resources_ folder from your Geometry Dash copy into the program's folder.
 
 Run GD.exe, search for levels and click open.Press P to start the level, w and s for scrolling up and down.
 
