@@ -11,6 +11,9 @@
 
 #include "SelectLevelLayer.h"
 
+#include <Windows.h>
+#include <ShlObj.h>
+
 GameLayer* GameLayer::instance;
 
 std::shared_ptr<GameLayer> GameLayer::create(int levelID)
@@ -58,12 +61,25 @@ bool GameLayer::init(int levelID)
     if (!gameSheet02)
         return false;
 
-    std::stringstream ss;
-    ss << "C:\\Users\\MaxNu\\AppData\\Local\\GeometryDash\\";
-    ss << songID;
-    ss << ".mp3";
     audioEngine = AudioEngine::create();
-    audioEngine->loadAudio(ss.str().c_str());
+
+    std::stringstream ss;
+
+    PWSTR localAppDataPath;
+    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &localAppDataPath))) {
+        
+        std::wstring wideString(localAppDataPath);
+        std::string localAppDataPathStr(wideString.begin(), wideString.end());
+
+        CoTaskMemFree(localAppDataPath);
+
+        std::cout << localAppDataPathStr << std::endl;
+
+        ss << localAppDataPathStr << "\\GeometryDash\\";
+        ss << songID;
+        ss << ".mp3";
+        audioEngine->loadAudio(ss.str().c_str());
+    }
 
     ss.str("");
     ss.clear();
@@ -174,7 +190,7 @@ void GameLayer::draw()
     tex->draw(*gameSheet01_t3_blending);
     tex->draw(*gameSheet01_t3);
     tex->draw(*gameSheet02);
-    tex->draw(framerate);
+    //tex->draw(framerate);
 
     //drawImGui();
 }
