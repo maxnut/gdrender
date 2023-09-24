@@ -8,6 +8,7 @@
 #define IMGUI 1
 
 Application* Application::instance;
+const float Application::zoomModifier = 3.f;
 
 void Application::start()
 {
@@ -114,9 +115,9 @@ void Application::draw()
 
     renderTexture.display();
     sf::Sprite sprite(renderTexture.getTexture());
-    sf::Vector2f scaleFactor = { 1, 1 };
+    float scaleFactor = 1.f;
     scaleFactor *= (float)window->getSize().x / (float)renderTexture.getSize().x;
-    sprite.setScale(scaleFactor);
+    sprite.setScale(scaleFactor, scaleFactor);
     window->draw(sprite);
 
 #if IMGUI == 1

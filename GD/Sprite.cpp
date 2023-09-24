@@ -96,11 +96,6 @@ void Sprite::setOpacityWithoutSend(sf::Uint8 opacity)
     }
 }
 
-bool special_compare(Sprite* s1, std::shared_ptr<Sprite> s2)
-{
-    return s1 == s2.get();
-}
-
 void Sprite::removeFromBatcher()
 {
     if(currentBatcher)

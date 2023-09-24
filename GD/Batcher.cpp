@@ -1,10 +1,12 @@
 #include "Batcher.h"
 #include "GameLayer.h"
+#include "Application.h"
 
 std::map<std::string, std::shared_ptr<sf::Texture>> Batcher::images;
 
 void Batcher::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+    states.transform.scale(Application::zoomModifier, Application::zoomModifier);
     states.transform *= getTransform();
 
     states.texture = texture;

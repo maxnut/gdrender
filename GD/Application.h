@@ -16,6 +16,8 @@ public:
 	sf::RenderTexture renderTexture;
 	float deltaTime;
 
+	static const float zoomModifier;
+
 	static Application* instance;
 public:
 	void start();

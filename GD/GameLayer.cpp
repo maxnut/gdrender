@@ -28,7 +28,7 @@ std::shared_ptr<GameLayer> GameLayer::create(int levelID)
 
 bool GameLayer::init(int levelID)
 {
-    camera = sf::View(sf::FloatRect(-950.f, -500.f, 1920, 1080));
+    camera = sf::View(sf::FloatRect(-800.f, -950.f, 1920, 1080));
     //camera.zoom(0.3f);
 
     instance = this;
@@ -89,9 +89,8 @@ bool GameLayer::init(int levelID)
 
     backgroundSprite = std::shared_ptr<sf::Sprite>(new sf::Sprite);
     backgroundSprite->setTexture(*backgroundTexture);
-    backgroundSprite->setScale(0.7f, 0.7f);
+    backgroundSprite->setScale(0.5f * Application::zoomModifier, 0.5f * Application::zoomModifier);
     backgroundSprite->setOrigin(backgroundSprite->getTextureRect().width / 2.f, backgroundSprite->getTextureRect().height / 2.f);
-    backgroundSprite->setPosition(0, -500);
 
     updateLevelColors();
 
@@ -125,13 +124,14 @@ void GameLayer::update()
     float step = app->deltaTime * 60.0f;
 
     float movementX = canStart && move ? (float)((double)step * xVel * camSpeed) : 0;
+    movementX *= Application::zoomModifier;
 
-    sf::Vector2f prev = camera.getCenter();
+    sf::Vector2f prev = camera.getCenter() / Application::zoomModifier;
 
     camera.move({ movementX, (app->keyPressedMap[sf::Keyboard::W] - app->keyPressedMap[sf::Keyboard::S]) * app->deltaTime * -speed });
     app->renderTexture.setView(camera);
 
-    deltaMove = camera.getCenter() - prev;
+    deltaMove = (camera.getCenter() / Application::zoomModifier) - prev;
 
     const auto now = std::chrono::high_resolution_clock::now();
 
@@ -188,7 +188,7 @@ void GameLayer::draw()
     tex->draw(*gameSheet01_t3_blending);
     tex->draw(*gameSheet01_t3);
     tex->draw(*gameSheet02);
-    tex->draw(framerate);
+    //tex->draw(framerate);
 
     //drawImGui();
 }
@@ -585,12 +585,12 @@ void GameLayer::setupLevel(std::string_view levelString)
         }
     }
 
-    colorChannels[1005] = ColorChannel::create(sf::Color::Blue, 1005);
+    colorChannels[1005]->setColor(sf::Color::Blue);
     colorChannels[1005]->blending = true;
-    colorChannels[1006] = ColorChannel::create(sf::Color::Yellow, 1006);
+    colorChannels[1006]->setColor(sf::Color::Yellow);
     colorChannels[1006]->blending = true;
-    colorChannels[1010] = ColorChannel::create(sf::Color::Black, 1010);
-    colorChannels[1007] = ColorChannel::create(colorChannels[1000]->getColor(), 1007);
+    colorChannels[1010]->setColor(sf::Color::Black);
+    colorChannels[1005]->setColor(colorChannels[1000]->getColor());
     colorChannels[1007]->blending = true;
 }
 
@@ -645,7 +645,7 @@ void GameLayer::updateTriggers()
             for (auto& pair : section)
             {
                 auto obj = pair.second;
-                if (obj->getPosition().x > camera.getCenter().x)
+                if (obj->getPosition().x > camera.getCenter().x / Application::zoomModifier - 75.f)
                     continue;
 
                 if (obj->isTrigger)
@@ -682,9 +682,7 @@ void GameLayer::updateTriggers()
 void GameLayer::updateVisibility()
 {
     auto winSize = camera.getSize();
-    auto camPos = camera.getCenter().x;
-
-    float unk = 70.0f;
+    auto camPos = camera.getCenter().x / Application::zoomModifier;
 
     int prevSection = floorf((camPos - (winSize.x / 3)) / 100) + 1;
     int nextSection = ceilf((camPos) / 100) + 3;
