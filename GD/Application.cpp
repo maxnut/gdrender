@@ -8,13 +8,13 @@
 #define IMGUI 1
 
 Application* Application::instance;
-const float Application::zoomModifier = 3.f;
+const float Application::zoomModifier = 1.f;
 
 void Application::start()
 {
     instance = this;
 
-    window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "GD", sf::Style::Fullscreen);
+    window = new sf::RenderWindow(sf::VideoMode::getDesktopMode(), "GD", sf::Style::Fullscreen);
     renderTexture.create(1920, 1080);
     window->setFramerateLimit(50000);
     window->setVerticalSyncEnabled(false);
