@@ -28,7 +28,7 @@ std::shared_ptr<GameLayer> GameLayer::create(int levelID)
 
 bool GameLayer::init(int levelID)
 {
-    camera = sf::View(sf::FloatRect(-900.f, -500.f, 1920, 1080));
+    camera = sf::View(sf::FloatRect(-950.f, -500.f, 1920, 1080));
     //camera.zoom(0.3f);
 
     instance = this;
@@ -37,7 +37,7 @@ bool GameLayer::init(int levelID)
     framerate.setFont(font);
     framerate.setCharacterSize(24);
 
-    loadLevel(std::to_string(levelID));//10565740 bloodbath 91946111 opengd 59075347 tartarus 52374843 zodiac 77292103 white space 89187968 edge of destiny 87665224 kocmoc 86084399 limbo 62152040 ocular miracle 76159410 cosmic cyclone
+    loadLevel(std::to_string(levelID));
 
     gameSheet01_t3 = Batcher::create("Resources\\GJ_GameSheet-uhd.png");
     if (!gameSheet01_t3)
@@ -153,7 +153,7 @@ void GameLayer::update()
 
     previous_frame = now;
 
-    backgroundSprite->setPosition(camera.getCenter());
+    backgroundSprite->setPosition({ camera.getCenter().x, camera.getCenter().y - 100});
     framerate.setPosition(camera.getCenter() - (camera.getSize() / 2.f));
 
     updateTriggers();
@@ -188,7 +188,7 @@ void GameLayer::draw()
     tex->draw(*gameSheet01_t3_blending);
     tex->draw(*gameSheet01_t3);
     tex->draw(*gameSheet02);
-    //tex->draw(framerate);
+    tex->draw(framerate);
 
     //drawImGui();
 }
@@ -432,18 +432,10 @@ void GameLayer::loadLevel(std::string levelId)
         }
     }
 
-    std::deque<int> toRemove;
-
     for (auto& pair : colorChannels)
     {
-        if (pair.second == nullptr)
-            toRemove.push_back(pair.first);
-        else
-            dirtyChannels.push_back(pair.first);
+        dirtyChannels.push_back(pair.first);
     }
-
-    for (int i : toRemove)
-        colorChannels.erase(i);
 }
 
 void GameLayer::setupLevel(std::string_view levelString)
@@ -558,6 +550,7 @@ void GameLayer::setupLevel(std::string_view levelString)
                         break;
                     }
                 }
+                
                 if (colorChannels.contains(key))
                 {
                     col = colorChannels[key];
@@ -646,9 +639,7 @@ void GameLayer::setupObjects(std::string_view levelString)
 
 void GameLayer::updateTriggers()
 {
-    int currentSection = Common::sectionForPos(camera.getCenter().x);
-
-    for (int i = currentSection - 3; i < currentSection; i++)
+    for (int i = prevSection; i < nextSection; i++)
     {
         if (i < sectionObjects.size() && i >= 0)
         {
@@ -746,8 +737,8 @@ void GameLayer::updateVisibility()
 
                     obj->updatePosition();
 
-                    //if (obj->isTrigger)
-                        //continue;
+                    if (obj->isTrigger)
+                        continue;
 
                     obj->updateOpacity();
 

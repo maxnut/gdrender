@@ -26,7 +26,10 @@ void EffectGameObject::triggerActivated()
 	case 105:
 	case 899:
 	{
-		if (!gameLayer->colorChannels.contains(targetColorId) || !gameLayer->colorChannels[targetColorId])
+		if (!gameLayer->colorChannels.contains(targetColorId))
+			gameLayer->colorChannels[targetColorId] = ColorChannel::create(sf::Color::White, targetColorId);
+
+		if (!gameLayer->colorChannels[targetColorId])
 			return;
 
 		auto foundAction = gameLayer->colorChannels[targetColorId]->colorActionChannel;
@@ -77,6 +80,9 @@ void EffectGameObject::triggerActivated()
 		if (!gameLayer->colorChannels.contains(targetGroupId) && pulseType == 0 || !gameLayer->groups.contains(targetGroupId) && pulseType == 1)
 			return;
 
+		if (pulseType == 0 && !gameLayer->colorChannels[targetGroupId])
+			return;
+
 		if (pulseMode == 1)
 		{
 			copyColorID = copyColorID == -2 ? targetGroupId : copyColorID;
@@ -104,7 +110,8 @@ void EffectGameObject::triggerActivated()
 
 		auto moveAction = MoveAction::create(duration, targetGroupId, movement, lockPlayerX, lockPlayerY);
 
-		gameLayer->moveActionsActive.push_back(actionEasing(moveAction, easeRate));
+		if(moveAction)
+			gameLayer->moveActionsActive.push_back(actionEasing(moveAction, easeRate));
 	}
 		break;
 	case 1049:
@@ -124,9 +131,9 @@ void EffectGameObject::triggerActivated()
 		if (!gameLayer->groups.contains(targetGroupId))
 			return;
 
-		auto ac = SpawnAction::create(spawnDelay, gameLayer->groups[targetGroupId]);
-		if (ac)
-			gameLayer->spawnActionsActive.push_back(ac);
+		auto spawn = SpawnAction::create(spawnDelay, gameLayer->groups[targetGroupId]);
+		if (spawn)
+			gameLayer->spawnActionsActive.push_back(spawn);
 	}
 		break;
 	case 1346:

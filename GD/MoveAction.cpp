@@ -13,7 +13,7 @@ std::shared_ptr<MoveAction> MoveAction::create(float duration, int target, sf::V
 
 bool MoveAction::init(float duration, int target, sf::Vector2f movement, bool followX, bool followY)
 {
-	if (!GameLayer::instance->groups.contains(target))
+	if (!GameLayer::instance->groups.contains(target) || !GameLayer::instance->groups[target])
 		return false;
 
 	this->groupID = target;

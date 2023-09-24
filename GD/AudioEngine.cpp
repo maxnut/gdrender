@@ -42,7 +42,7 @@ bool AudioEngine::loadAudio(const char* filePath) {
         return false;
     }
 
-    FMOD_RESULT result = system->createStream(filePath, FMOD_DEFAULT, nullptr, &sound);
+    FMOD_RESULT result = system->createSound(filePath, FMOD_DEFAULT, nullptr, &sound);
     if (result != FMOD_OK) {
         return false;
     }

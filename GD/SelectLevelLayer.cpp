@@ -52,7 +52,7 @@ void SelectLevelLayer::draw()
 	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, { 10, 10 });
-	if (ImGui::BeginTable("table1", 8,
+	if (ImGui::BeginTable("table1", 7,
 		ImGuiTableFlags_RowBg | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_Resizable |
 		ImGuiTableFlags_Borders | ImGuiTableFlags_NoBordersInBody))
 	{

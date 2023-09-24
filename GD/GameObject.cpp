@@ -148,6 +148,8 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 			break;
 		case 10:
 			effectPtr->duration = Common::stof(properties[i + 1]);
+			if (effectPtr->duration < 0)
+				effectPtr->duration = 0;
 			break;
 		case 11:
 			effectPtr->touchTriggered = Common::stoi(properties[i + 1]);
