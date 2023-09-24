@@ -247,8 +247,6 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 			for (std::string_view groupStr : groups)
 			{
 				int group = Common::stoi(groupStr);
-				if (!GameLayer::instance->groups.contains(group))
-					GameLayer::instance->groups[group] = Group::create();
 
 				ptr->groups.push_back(group);
 
@@ -299,12 +297,6 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 			break;
 		}
 	}
-
-	if (!GameLayer::instance->colorChannels.contains(ptr->primaryColorChannel))
-		GameLayer::instance->colorChannels[ptr->primaryColorChannel] = ColorChannel::create(sf::Color::White, ptr->primaryColorChannel);
-
-	if (!GameLayer::instance->colorChannels.contains(ptr->secondaryColorChannel))
-		GameLayer::instance->colorChannels[ptr->secondaryColorChannel] = ColorChannel::create(sf::Color::White, ptr->secondaryColorChannel);
 
 	if(objectEntry.contains("color_type"))
 	{

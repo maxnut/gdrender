@@ -67,12 +67,13 @@ public:
 	std::vector<std::shared_ptr<OpacityAction>> opacityActionsActive;
 	std::vector<std::shared_ptr<ActionInterval>> moveActionsActive;
 	std::vector<std::shared_ptr<SpawnAction>> spawnActionsActive;
+	std::vector<std::shared_ptr<SpawnAction>> spawnActionsPending;
 	std::vector<std::shared_ptr<ActionInterval>> rotateActionsActive;
 	std::vector<int> dirtyChannels;
 	std::vector<int> dirtyGroups;
 
-	std::unordered_map<int, std::shared_ptr<ColorChannel>> colorChannels;
-	std::unordered_map<int, std::shared_ptr<Group>> groups;
+	std::shared_ptr<ColorChannel> colorChannels[1013];
+	std::shared_ptr<Group> groups[1013];
 
 	sf::Text framerate;
 	sf::Font font;

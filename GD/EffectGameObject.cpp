@@ -7,7 +7,7 @@ void EffectGameObject::triggerActivated()
 	if(wasTriggerActivated)
 		return;
 
-	if(!multiActivate && !spawnTriggered)
+	if(!multiActivate || !spawnTriggered)
 		wasTriggerActivated = true;
 
 	if (objectID == 29)
@@ -26,11 +26,8 @@ void EffectGameObject::triggerActivated()
 	case 105:
 	case 899:
 	{
-		if (!gameLayer->colorChannels.contains(targetColorId))
-			gameLayer->colorChannels[targetColorId] = ColorChannel::create(sf::Color::White, targetColorId);
-
-		if (!gameLayer->colorChannels[targetColorId])
-			return;
+		//if (!gameLayer->colorChannels[targetColorId])
+			//return;
 
 		auto foundAction = gameLayer->colorChannels[targetColorId]->colorActionChannel;
 		if (foundAction)
@@ -77,15 +74,15 @@ void EffectGameObject::triggerActivated()
 	}
 	case 1006:
 	{
-		if (!gameLayer->colorChannels.contains(targetGroupId) && pulseType == 0 || !gameLayer->groups.contains(targetGroupId) && pulseType == 1)
-			return;
-
-		if (pulseType == 0 && !gameLayer->colorChannels[targetGroupId])
-			return;
+		//if (pulseType == 0 && !gameLayer->colorChannels[targetGroupId])
+			//return;
 
 		if (pulseMode == 1)
 		{
 			copyColorID = copyColorID == -2 ? targetGroupId : copyColorID;
+			//if (!gameLayer->colorChannels[copyColorID])
+				//return;
+
 			sf::Color copyColor = gameLayer->colorChannels[copyColorID] ? gameLayer->colorChannels[copyColorID]->getColor() : sf::Color::White;
 			triggerColor = HSV::combine(copyColor, copyColorHSV);
 		}
@@ -98,16 +95,10 @@ void EffectGameObject::triggerActivated()
 	}
 	case 1007:
 
-		if (!gameLayer->groups.contains(targetGroupId))
-			return;
-
 		gameLayer->opacityActionsActive.push_back(OpacityAction::create(duration, targetGroupId, gameLayer->groups[targetGroupId]->groupOpacity, triggerColor.a / 255.f));
 		break;
 	case 901:
 	{
-		if (!gameLayer->groups.contains(targetGroupId))
-			return;
-
 		auto moveAction = MoveAction::create(duration, targetGroupId, movement, lockPlayerX, lockPlayerY);
 
 		if(moveAction)
@@ -115,8 +106,6 @@ void EffectGameObject::triggerActivated()
 	}
 		break;
 	case 1049:
-		if (!gameLayer->groups.contains(targetGroupId))
-			return;
 		for (auto pair : gameLayer->groups[targetGroupId]->objects)
 		{
 			for (auto pair2 : pair.second)
@@ -128,9 +117,6 @@ void EffectGameObject::triggerActivated()
 		break;
 	case 1268:
 	{
-		if (!gameLayer->groups.contains(targetGroupId))
-			return;
-
 		auto spawn = SpawnAction::create(spawnDelay, gameLayer->groups[targetGroupId]);
 		if (spawn)
 			gameLayer->spawnActionsActive.push_back(spawn);
@@ -138,9 +124,6 @@ void EffectGameObject::triggerActivated()
 		break;
 	case 1346:
 	{
-		if (!gameLayer->groups.contains(targetGroupId))
-			return;
-
 		if (gameLayer->groups[targetGroupId]->rotateAction != nullptr)
 			gameLayer->groups[targetGroupId]->rotateAction->stop();
 

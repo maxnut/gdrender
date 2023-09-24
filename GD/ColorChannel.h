@@ -28,6 +28,10 @@ public:
 	static std::shared_ptr<ColorChannel> create(sf::Color color, int id);
 
 	void setColor(sf::Color color, bool pulse = false);
+	void setR(sf::Uint8 r, bool pulse = false);
+	void setG(sf::Uint8 g, bool pulse = false);
+	void setB(sf::Uint8 b, bool pulse = false);
+	void setA(sf::Uint8 a, bool pulse = false);
 	sf::Color getColor();
 	sf::Color getNonPulseColor();
 

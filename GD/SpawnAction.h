@@ -12,5 +12,5 @@ public:
 	static std::shared_ptr<SpawnAction> create(float duration, std::shared_ptr<Group> groups);
 	bool init(float duration, std::shared_ptr<Group> groups);
 
-	virtual void stop() override;
+	void spawn();
 };

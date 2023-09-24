@@ -18,10 +18,8 @@ bool SpawnAction::init(float duration, std::shared_ptr<Group> group)
 	return true;
 }
 
-void SpawnAction::stop()
+void SpawnAction::spawn()
 {
-	ActionInterval::stop();
-
 	for (auto pair : group->objects)
 	{
 		for (auto pair2 : pair.second)

@@ -203,7 +203,7 @@ void GameLayer::processColorActions()
     std::deque<std::shared_ptr<SpawnAction>> toRemoveSpawn;
     std::deque<std::shared_ptr<ActionInterval>> toRemoveRotate;
 
-    for (auto ac : colorActionsActive)
+    for (auto&ac : colorActionsActive)
     {
         ac->step(Application::instance->deltaTime);
 
@@ -211,7 +211,7 @@ void GameLayer::processColorActions()
             toRemoveColor.push_back(ac);
     }
 
-    for (auto ac : pulseActionsActive)
+    for (auto&ac : pulseActionsActive)
     {
         ac->step(Application::instance->deltaTime);
 
@@ -219,7 +219,7 @@ void GameLayer::processColorActions()
             toRemovePulse.push_back(ac);
     }
 
-    for (auto ac : opacityActionsActive)
+    for (auto&ac : opacityActionsActive)
     {
         ac->step(Application::instance->deltaTime);
 
@@ -227,7 +227,7 @@ void GameLayer::processColorActions()
             toRemoveOpacity.push_back(ac);
     }
 
-    for (auto ac : copyColorActionsActive)
+    for (auto&ac : copyColorActionsActive)
     {
         ac->step(Application::instance->deltaTime);
 
@@ -235,7 +235,7 @@ void GameLayer::processColorActions()
             toRemoveCopyColor.push_back(ac);
     }
 
-    for (auto ac : moveActionsActive)
+    for (auto&ac : moveActionsActive)
     {
         if (ac)
         {
@@ -246,7 +246,7 @@ void GameLayer::processColorActions()
         }
     }
 
-    for (auto ac : spawnActionsActive)
+    for (auto&ac : spawnActionsActive)
     {
         ac->step(Application::instance->deltaTime);
 
@@ -254,7 +254,7 @@ void GameLayer::processColorActions()
             toRemoveSpawn.push_back(ac);
     }
 
-    for (auto ac : rotateActionsActive)
+    for (auto&ac : rotateActionsActive)
     {
         ac->step(Application::instance->deltaTime);
 
@@ -278,7 +278,10 @@ void GameLayer::processColorActions()
         moveActionsActive.erase(std::find(moveActionsActive.begin(), moveActionsActive.end(), ac));
 
     for (auto& ac : toRemoveSpawn)
+    {
+        ac->spawn(); //activate spawn here otherwise we add actions while looping
         spawnActionsActive.erase(std::find(spawnActionsActive.begin(), spawnActionsActive.end(), ac));
+    }
 
     for (auto& ac : toRemoveRotate)
         rotateActionsActive.erase(std::find(rotateActionsActive.begin(), rotateActionsActive.end(), ac));
@@ -344,6 +347,12 @@ void GameLayer::onExit()
 
 void GameLayer::loadLevel(std::string levelId)
 {
+    for (int i = 0; i < 1013; i++)
+    {
+        colorChannels[i] = ColorChannel::create(sf::Color::White, i);
+        groups[i] = Group::create();
+    }
+
     std::string levelString;
     std::string_view levelStringView = "";
 
@@ -432,9 +441,9 @@ void GameLayer::loadLevel(std::string levelId)
         }
     }
 
-    for (auto& pair : colorChannels)
+    for (auto& channel : colorChannels)
     {
-        dirtyChannels.push_back(pair.first);
+        dirtyChannels.push_back(channel->id);
     }
 }
 
@@ -443,35 +452,31 @@ void GameLayer::setupLevel(std::string_view levelString)
     std::vector<std::string_view> levelData =
         Common::splitByDelimStringView(Common::splitByDelimStringView(levelString, ';')[0], ',');
 
-    sf::Uint8 r, g, b;
-
     for (size_t i = 0; i < levelData.size() - 1; i += 2)
     {
         if (levelData[i] == "kS1")
         {
-            r = Common::stoi(levelData[i + 1]);
+            colorChannels[1000]->setR(Common::stoi(levelData[i + 1]));
         }
         else if (levelData[i] == "kS2")
         {
-            g = Common::stoi(levelData[i + 1]);
+            colorChannels[1000]->setG(Common::stoi(levelData[i + 1]));
         }
         else if (levelData[i] == "kS3")
         {
-            b = Common::stoi(levelData[i + 1]);
-            colorChannels.insert({ 1000, ColorChannel::create(sf::Color(r, g, b, 255), 1000) });
+            colorChannels[1000]->setB(Common::stoi(levelData[i + 1]));
         }
         else if (levelData[i] == "kS4")
         {
-            r = Common::stoi(levelData[i + 1]);
+            colorChannels[1001]->setR(Common::stoi(levelData[i + 1]));
         }
         else if (levelData[i] == "kS5")
         {
-            g = Common::stoi(levelData[i + 1]);
+            colorChannels[1001]->setG(Common::stoi(levelData[i + 1]));
         }
         else if (levelData[i] == "kS6")
         {
-            b = Common::stoi(levelData[i + 1]);
-            colorChannels.insert({ 1001, ColorChannel::create(sf::Color(r, g, b, 255), 1001) });
+            colorChannels[1001]->setB(Common::stoi(levelData[i + 1]));
         }
         else if (levelData[i] == "kS29")
         {
@@ -504,64 +509,59 @@ void GameLayer::setupLevel(std::string_view levelString)
             for (std::string_view colorData : colorString)
             {
                 auto innerData = Common::splitByDelimStringView(colorData, '_');
-                int key = -1;
-                auto col = ColorChannel::create(sf::Color::Magenta, -1);
-                col->blending = false;
-                sf::Uint8 rr = 0, gg = 0, bb = 0, aa = 255;
+
+                int key = 0;
+                sf::Color col;
+                bool blending = false;
+                HSV hsvModifier;
+                int copyID = -5;
+
                 for (size_t j = 0; j < innerData.size() - 1; j += 2)
                 {
                     switch (Common::stoi(innerData[j]))
                     {
                     case 1:
-                        rr = Common::stoi(innerData[j + 1]);
+                        col.r = Common::stoi(innerData[j + 1]);
                         break;
                     case 2:
-                        gg = Common::stoi(innerData[j + 1]);
+                        col.g = Common::stoi(innerData[j + 1]);
                         break;
                     case 3:
-                        bb = Common::stoi(innerData[j + 1]);
+                        col.b = Common::stoi(innerData[j + 1]);
                         break;
                     case 5:
-                        col->blending = Common::stoi(innerData[j + 1]);
+                        blending = Common::stoi(innerData[j + 1]);
                         break;
                     case 6:
                         key = Common::stoi(innerData[j + 1]);
                         break;
                     case 7:
-                        aa = Common::stof(innerData[j + 1]) * 255.f;
+                        col.a = Common::stof(innerData[j + 1]) * 255.f;
                         break;
                     case 9:
                     {
                         int copyID = Common::stoi(innerData[j + 1]);
-                        if(!colorChannels.contains(copyID))
-                            colorChannels.insert({ copyID, ColorChannel::create(sf::Color::White, copyID)});
-
-                        col->copyColor = colorChannels[copyID].get();
-                        colorChannels[copyID]->copiers.push_back(col.get());
                     }
                         break;
                     case 10:
                         auto hsv = Common::splitByDelimStringView(innerData[j + 1], 'a');
-                        col->hsvModifier.h = Common::stof(hsv[0]);
-                        col->hsvModifier.s = Common::stof(hsv[1]);
-                        col->hsvModifier.v = Common::stof(hsv[2]);
-                        col->hsvModifier.sChecked = Common::stoi(hsv[3]);
-                        col->hsvModifier.vChecked = Common::stoi(hsv[4]);
+                        hsvModifier.h = Common::stof(hsv[0]);
+                        hsvModifier.s = Common::stof(hsv[1]);
+                        hsvModifier.v = Common::stof(hsv[2]);
+                        hsvModifier.sChecked = Common::stoi(hsv[3]);
+                        hsvModifier.vChecked = Common::stoi(hsv[4]);
                         break;
                     }
                 }
                 
-                if (colorChannels.contains(key))
+                auto channel = colorChannels[key];
+                channel->setColor(col);
+                channel->blending = blending;
+                channel->hsvModifier = hsvModifier;
+                if (copyID != -5)
                 {
-                    col = colorChannels[key];
-                    col->id = key;
-                    col->setColor({ rr, gg, bb, aa });
-                }
-                else
-                {
-                    col->id = key;
-                    col->setColor({ rr, gg, bb, aa });
-                    colorChannels.insert({ key, col });
+                    channel->copyColor = colorChannels[copyID].get();
+                    colorChannels[copyID]->copiers.push_back(channel.get());
                 }
             }
         }
@@ -585,7 +585,7 @@ void GameLayer::setupLevel(std::string_view levelString)
         }
     }
 
-    colorChannels[1005] = ColorChannel::create(sf::Color::Magenta, 1005);
+    colorChannels[1005] = ColorChannel::create(sf::Color::Blue, 1005);
     colorChannels[1005]->blending = true;
     colorChannels[1006] = ColorChannel::create(sf::Color::Yellow, 1006);
     colorChannels[1006]->blending = true;
@@ -596,22 +596,20 @@ void GameLayer::setupLevel(std::string_view levelString)
 
 void GameLayer::fillColorChannel(std::span<std::string_view> colorString, int id)
 {
-    sf::Uint8 r = 0, g = 0, b = 0;
     for (size_t j = 0; j < colorString.size() - 1; j += 2)
     {
         switch (Common::stoi(colorString[j]))
         {
         case 1:
-            r = Common::stoi(colorString[j + 1]);
+            colorChannels[id]->setR(Common::stoi(colorString[j + 1]));
             break;
         case 2:
-            g = Common::stoi(colorString[j + 1]);
+            colorChannels[id]->setG(Common::stoi(colorString[j + 1]));
             break;
         case 3:
-            b = Common::stoi(colorString[j + 1]);
+            colorChannels[id]->setB(Common::stoi(colorString[j + 1]));
             break;
         }
-        colorChannels.insert({ id, ColorChannel::create(sf::Color(r, g, b, 255), id) });
     }
 }
 
@@ -984,9 +982,8 @@ void GameLayer::drawImGui()
         ImGui::TableSetupColumn("Color");
         ImGui::TableHeadersRow();
 
-        for (auto pair : colorChannels)
+        for (auto&channel : colorChannels)
         {
-            auto channel = pair.second;
             if (channel)
             {
                 ImGui::TableNextRow();

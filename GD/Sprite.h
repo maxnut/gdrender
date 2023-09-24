@@ -30,9 +30,9 @@ public:
     HSV* hsvModifier = nullptr;
 
     int channelType = 0; //0 none 1 primary 2 secondary
-    int atlasIndex = 0, childIndex = 0;
+    size_t atlasIndex = 0, childIndex = 0;
 
-    int uniqueID = 0;
+    size_t uniqueID = 0;
 
     bool pendRemove = false;
 
