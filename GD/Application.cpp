@@ -8,7 +8,7 @@
 #define IMGUI 1
 
 Application* Application::instance;
-const float Application::zoomModifier = 1.f;
+const float Application::zoomModifier = 3.f;
 
 void Application::start()
 {
