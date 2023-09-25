@@ -28,6 +28,8 @@ bool AudioEngine::init() {
         return false;
     }
 
+    isPlaying = false;
+
     return true;
 }
 
@@ -53,18 +55,21 @@ bool AudioEngine::loadAudio(const char* filePath) {
 void AudioEngine::play() {
     if (sound && !channel) {
         system->playSound(sound, nullptr, false, &channel);
+        isPlaying = true;
     }
 }
 
 void AudioEngine::pause() {
     if (channel) {
         channel->setPaused(true);
+        isPlaying = false;
     }
 }
 
 void AudioEngine::resume() {
     if (channel) {
         channel->setPaused(false);
+        isPlaying = true;
     }
 }
 

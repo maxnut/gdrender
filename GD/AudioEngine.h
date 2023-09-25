@@ -6,6 +6,12 @@
 #include <iostream>
 
 class AudioEngine {
+private:
+    FMOD::System* system;
+    FMOD::Sound* sound;
+    FMOD::Channel* channel;
+public:
+    bool isPlaying;
 public:
     
     ~AudioEngine();
@@ -20,9 +26,4 @@ public:
     void resume();
     void setVolume(float volume);
     void setPosition(float seconds);
-
-private:
-    FMOD::System* system;
-    FMOD::Sound* sound;
-    FMOD::Channel* channel;
 };

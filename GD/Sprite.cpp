@@ -38,13 +38,15 @@ void Sprite::sendVertices()
 
 void Sprite::updateVertexPosition(int index, sf::Transform& tr)
 {
-    vertices[index].position = originalPositions[index];
-    auto pos = vertices[index].position;
-    vertices[index].position = { pos.x * half.x, pos.y * half.y };
-    vertices[index].position += anchor;
+    sf::Vertex& vertex = vertices[index];
 
-    vertices[index].position = tr.transformPoint(vertices[index].position);
-    vertices[index].position.y *= -1;
+    vertex.position = originalPositions[index];
+    sf::Vector2f pos = vertex.position;
+    vertex.position = { pos.x * half.x, pos.y * half.y };
+    vertex.position += anchor;
+
+    vertex.position = tr.transformPoint(vertex.position);
+    vertex.position.y *= -1;
 }
 
 void Sprite::sendVertex(int index)

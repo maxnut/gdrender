@@ -59,10 +59,10 @@ sf::Color ColorChannel::getNonPulseColor()
 
 void ColorChannel::setDirtyRecusively()
 {
-	auto dirty = &GameLayer::instance->dirtyChannels;
+	std::vector<int> *dirty = &GameLayer::instance->dirtyChannels;
 	if (std::find(dirty->begin(), dirty->end(), id) == dirty->end())
 		dirty->push_back(id);
 
-	for (auto ptr : copiers)
+	for (ColorChannel* ptr : copiers)
 		ptr->setDirtyRecusively();
 }

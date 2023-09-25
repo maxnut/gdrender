@@ -28,7 +28,7 @@ bool ColorAction::init(float duration, int colorChannel, sf::Color from, sf::Col
 
 void ColorAction::update(float time)
 {
-	auto channel = GameLayer::instance->colorChannels[colorChannel];
+	std::shared_ptr<ColorChannel> channel = GameLayer::instance->colorChannels[colorChannel];
 	sf::Uint8 r = static_cast<sf::Uint8>(to.r - deltar * (1 - time));
 	sf::Uint8 g = static_cast<sf::Uint8>(to.g - deltag * (1 - time));
 	sf::Uint8 b = static_cast<sf::Uint8>(to.b - deltab * (1 - time));

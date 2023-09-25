@@ -25,7 +25,6 @@ private:
 	float lastObjXPos = 0;
 	float avg = 0;
 
-	float startTimer = 8.f;
 	float musicOffset = 0;
 
 	double camSpeed = 0.9;
@@ -118,5 +117,8 @@ public:
 	void updateTriggers();
 
 	void processColorActions();
-	void updateLevelColors();
+	void updateLevelObjects();
+
+	void moveCamera();
+	void calculateFramerate();
 };

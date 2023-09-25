@@ -13,9 +13,6 @@ std::shared_ptr<MoveAction> MoveAction::create(float duration, int target, sf::V
 
 bool MoveAction::init(float duration, int target, sf::Vector2f movement, bool followX, bool followY)
 {
-	//if (!GameLayer::instance->groups[target])
-		//return false;
-
 	this->groupID = target;
 	this->duration = duration;
 	this->targetGroup = GameLayer::instance->groups[target].get();
@@ -39,7 +36,7 @@ void MoveAction::update(float time)
 
 	targetGroup->moveTotal += deltaMovement;
 
-	auto dirty = &GameLayer::instance->dirtyGroups;
+	std::vector<int>* dirty = &GameLayer::instance->dirtyGroups;
 	if (std::find(dirty->begin(), dirty->end(), groupID) == dirty->end())
 		dirty->push_back(groupID);
 }

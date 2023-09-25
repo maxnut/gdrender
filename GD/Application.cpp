@@ -5,10 +5,9 @@
 #include "imgui.h"
 
 #define MULTITHREADING 0
-#define IMGUI 1
 
 Application* Application::instance;
-const float Application::zoomModifier = 3.f;
+const float Application::zoomModifier = 2.f;
 
 void Application::start()
 {
@@ -17,13 +16,12 @@ void Application::start()
     sf::ContextSettings settings;
     settings.antialiasingLevel = 4;
 
-    window = new sf::RenderWindow(sf::VideoMode::getDesktopMode(), "GD", sf::Style::Fullscreen);
+    window = new sf::RenderWindow(sf::VideoMode::getDesktopMode(), "GD", sf::Style::Fullscreen, settings);
     renderTexture.create(1920, 1080);
     window->setFramerateLimit(50000);
     window->setVerticalSyncEnabled(false);
     window->setActive(!MULTITHREADING);
 
-#if IMGUI == 1
     ImGui::SFML::Init(*window);
 
     ImGui::GetIO().Fonts->Clear();
@@ -34,7 +32,6 @@ void Application::start()
     style.ScaleAllSizes(3.f);
     style.WindowBorderSize = 0.0f;
     style.WindowPadding = ImVec2(50.0f, 50.0f);
-#endif
 
     std::shared_ptr<SelectLevelLayer> layer = SelectLevelLayer::create();
     pushLayer(layer);
@@ -47,9 +44,11 @@ void Application::start()
     while (window->isOpen())
     {
         update();
+
 #if MULTITHREADING == 0
         draw();
 #endif
+
     }
 
     onQuit();
@@ -73,9 +72,8 @@ void Application::update()
     sf::Event event;
     while (window->pollEvent(event))
     {
-#if IMGUI == 1
         ImGui::SFML::ProcessEvent(event);
-#endif
+
         if (event.type == sf::Event::Closed)
             window->close();
         else if (event.type == sf::Event::KeyPressed)
@@ -85,9 +83,9 @@ void Application::update()
     }
 
     currentLayer->update();
-#if IMGUI == 1
+
     ImGui::SFML::Update(*window, dt);
-#endif
+
 }
 
 void Application::draw()
@@ -111,9 +109,7 @@ void Application::draw()
     window->clear(sf::Color::Blue);
     renderTexture.clear();
 
-#if IMGUI == 1
     ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
-#endif
     currentLayer->draw();
 
     renderTexture.display();
@@ -123,10 +119,8 @@ void Application::draw()
     sprite.setScale(scaleFactor, scaleFactor);
     window->draw(sprite);
 
-#if IMGUI == 1
     ImGui::PopFont();
     ImGui::SFML::Render(*window);
-#endif
 
     window->display();
 #endif
@@ -134,9 +128,7 @@ void Application::draw()
 
 void Application::onQuit()
 {
-#if IMGUI == 1
     ImGui::SFML::Shutdown();
-#endif
 }
 
 void Application::pushLayer(std::shared_ptr<Layer> layer)

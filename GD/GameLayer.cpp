@@ -26,6 +26,8 @@ std::shared_ptr<GameLayer> GameLayer::create(int levelID)
 	return nullptr;
 }
 
+
+
 bool GameLayer::init(int levelID)
 {
     camera = sf::View(sf::FloatRect(-950.f, -950.f, 1920, 1080));
@@ -92,10 +94,12 @@ bool GameLayer::init(int levelID)
     backgroundSprite->setScale(0.5f * Application::zoomModifier, 0.5f * Application::zoomModifier);
     backgroundSprite->setOrigin(backgroundSprite->getTextureRect().width / 2.f, backgroundSprite->getTextureRect().height / 2.f);
 
-    updateLevelColors();
+    updateLevelObjects();
 
     return true;
 }
+
+
 
 void GameLayer::update()
 {
@@ -108,21 +112,65 @@ void GameLayer::update()
     }
 
     if (app->keyPressedMap[sf::Keyboard::P])
-        startTimer = 0;
+        canStart = true;
 
-    if(!canStart && startTimer <= 0)
+    if(canStart && !audioEngine->isPlaying)
     {
         audioEngine->play();
         audioEngine->setPosition(musicOffset);
         audioEngine->setVolume(0.1f);
     }
 
-    canStart = startTimer <= 0;
+    moveCamera();
+
+    calculateFramerate();
+
+    if(canStart)
+        updateTriggers();
+
+    processColorActions();
+
+    updateLevelObjects();
+    updateVisibility();
+
+    audioEngine->update();
+}
+
+
+
+void GameLayer::draw()
+{
+    sf::RenderTexture* tex = &Application::instance->renderTexture;
+
+    tex->draw(*backgroundSprite);
+    tex->draw(*gameSheet01_b4_blending);
+    tex->draw(*gameSheet01_b4);
+    tex->draw(*gameSheet01_b3_blending);
+    tex->draw(*gameSheet01_b3);
+    tex->draw(*gameSheet01_b2_blending);
+    tex->draw(*gameSheet01_b2);
+    tex->draw(*gameSheet01_b1_blending);
+    tex->draw(*gameSheet01_b1);
+    tex->draw(*gameSheet01_t1_blending);
+    tex->draw(*gameSheet01_t1);
+    tex->draw(*gameSheet01_t2_blending);
+    tex->draw(*gameSheet01_t2);
+    tex->draw(*gameSheet01_t3_blending);
+    tex->draw(*gameSheet01_t3);
+    tex->draw(*gameSheet02);
+    tex->draw(framerate);
+
+    //drawImGui();
+}
+
+
+
+void GameLayer::moveCamera()
+{
+    Application* app = Application::instance;
 
     float speed = app->keyPressedMap[sf::Keyboard::LShift] ? 1000.f : 500.f;
-
     float step = app->deltaTime * 60.0f;
-
     float movementX = canStart && move ? (float)((double)step * xVel * camSpeed) : 0;
     movementX *= Application::zoomModifier;
 
@@ -133,6 +181,14 @@ void GameLayer::update()
 
     deltaMove = (camera.getCenter() / Application::zoomModifier) - prev;
 
+    backgroundSprite->setPosition({ camera.getCenter().x, camera.getCenter().y - 100 });
+    framerate.setPosition(camera.getCenter() - (camera.getSize() / 2.f));
+}
+
+
+
+void GameLayer::calculateFramerate()
+{
     const auto now = std::chrono::high_resolution_clock::now();
 
     const std::chrono::duration<float> diff = now - previous_frame;
@@ -152,46 +208,9 @@ void GameLayer::update()
     }
 
     previous_frame = now;
-
-    backgroundSprite->setPosition({ camera.getCenter().x, camera.getCenter().y - 100});
-    framerate.setPosition(camera.getCenter() - (camera.getSize() / 2.f));
-
-    updateTriggers();
-
-    processColorActions();
-
-    updateLevelColors();
-    updateVisibility();
-
-    audioEngine->update();
 }
 
-void GameLayer::draw()
-{
-    Application* app = Application::instance;
-    sf::RenderWindow* window = app->window;
-    sf::RenderTexture* tex = &app->renderTexture;
 
-    tex->draw(*backgroundSprite);
-    tex->draw(*gameSheet01_b4_blending);
-    tex->draw(*gameSheet01_b4);
-    tex->draw(*gameSheet01_b3_blending);
-    tex->draw(*gameSheet01_b3);
-    tex->draw(*gameSheet01_b2_blending);
-    tex->draw(*gameSheet01_b2);
-    tex->draw(*gameSheet01_b1_blending);
-    tex->draw(*gameSheet01_b1);
-    tex->draw(*gameSheet01_t1_blending);
-    tex->draw(*gameSheet01_t1);
-    tex->draw(*gameSheet01_t2_blending);
-    tex->draw(*gameSheet01_t2);
-    tex->draw(*gameSheet01_t3_blending);
-    tex->draw(*gameSheet01_t3);
-    tex->draw(*gameSheet02);
-    //tex->draw(framerate);
-
-    //drawImGui();
-}
 
 void GameLayer::processColorActions()
 {
@@ -287,8 +306,11 @@ void GameLayer::processColorActions()
         rotateActionsActive.erase(std::find(rotateActionsActive.begin(), rotateActionsActive.end(), ac));
 }
 
-void GameLayer::updateLevelColors()
+
+
+void GameLayer::updateLevelObjects()
 {
+
     for (int channel : dirtyChannels)
     {
         if (channel < 0)
@@ -301,7 +323,7 @@ void GameLayer::updateLevelColors()
             {
                 for (auto pair : colorChannels[channel]->channelSprites[i])
                 {
-                    auto sprite = pair.second;
+                    Sprite* sprite = pair.second;
                     sprite->setColorWithoutSend(colorChannels[channel]->getColor());
                     sprite->setOpacity(colorChannels[channel]->getColor().a);
                 }
@@ -326,24 +348,28 @@ void GameLayer::updateLevelColors()
             updateSection.reserve(map->size());
             for (auto pair : *map)
             {
-                auto obj = pair.second;
+                GameObject* obj = pair.second;
                 if (obj)
                 {
                     obj->updatePosition();
                     updateSection.push_back(obj);
                 }
             }
-            for (auto obj : updateSection)
+            for (GameObject* obj : updateSection)
                 obj->tryUpdateSection();
         }
     }
     dirtyGroups.clear();
 }
 
+
+
 void GameLayer::onExit()
 {
     instance = nullptr;
 }
+
+
 
 void GameLayer::loadLevel(std::string levelId)
 {
@@ -360,15 +386,15 @@ void GameLayer::loadLevel(std::string levelId)
     {
         cpr::Session session;
 
-        auto url = cpr::Url("http://www.boomlings.com/database/downloadGJLevel22.php");
-        auto payload = cpr::Payload{ { "secret", "Wmfd2893gb7" }, { "levelID", levelId } };
+        cpr::Url url = cpr::Url("http://www.boomlings.com/database/downloadGJLevel22.php");
+        cpr::Payload payload = cpr::Payload{ { "secret", "Wmfd2893gb7" }, { "levelID", levelId } };
 
         session.SetUrl(url);
         session.SetPayload(payload);
         session.SetUserAgent(cpr::UserAgent(""));
 
         cpr::Response r = session.Post();
-        auto levelSplit = Common::splitByDelim(r.text, ':');
+        std::vector<std::string_view> levelSplit = Common::splitByDelimStringView(r.text, ':');
 
         std::map<std::string_view, std::string_view> levelResponse;
 
@@ -399,7 +425,7 @@ void GameLayer::loadLevel(std::string levelId)
     {
         lastObjXPos = 570.0f;
 
-        for (auto object : objects)
+        for (std::shared_ptr<GameObject> object : objects)
         {
             if (lastObjXPos < object->getPosition().x)
                 lastObjXPos = object->getPosition().x;
@@ -411,7 +437,7 @@ void GameLayer::loadLevel(std::string levelId)
             sectionObjects.push_back(map);
         }
 
-        for (auto object : objects)
+        for (std::shared_ptr<GameObject> object : objects)
         {
             sectionObjects[object->section].insert({ object->uniqueID, object.get()});
         }
@@ -441,7 +467,7 @@ void GameLayer::loadLevel(std::string levelId)
         }
     }
 
-    for (auto& channel : colorChannels)
+    for (std::shared_ptr<ColorChannel>& channel : colorChannels)
     {
         dirtyChannels.push_back(channel->id);
     }
@@ -480,35 +506,35 @@ void GameLayer::setupLevel(std::string_view levelString)
         }
         else if (levelData[i] == "kS29")
         {
-            auto colorString = Common::splitByDelimStringView(levelData[i + 1], '_');
+            std::vector<std::string_view> colorString = Common::splitByDelimStringView(levelData[i + 1], '_');
             fillColorChannel(colorString, 1000);
         }
         else if (levelData[i] == "kS30")
         {
-            auto colorString = Common::splitByDelimStringView(levelData[i + 1], '_');
+            std::vector<std::string_view> colorString = Common::splitByDelimStringView(levelData[i + 1], '_');
             fillColorChannel(colorString, 1001);
         }
         else if (levelData[i] == "kS31")
         {
-            auto colorString = Common::splitByDelimStringView(levelData[i + 1], '_');
+            std::vector<std::string_view> colorString = Common::splitByDelimStringView(levelData[i + 1], '_');
             fillColorChannel(colorString, 1002);
         }
         else if (levelData[i] == "kS32")
         {
-            auto colorString = Common::splitByDelimStringView(levelData[i + 1], '_');
+            std::vector<std::string_view> colorString = Common::splitByDelimStringView(levelData[i + 1], '_');
             fillColorChannel(colorString, 1004);
         }
         else if (levelData[i] == "kS37")
         {
-            auto colorString = Common::splitByDelimStringView(levelData[i + 1], '_');
+            std::vector<std::string_view> colorString = Common::splitByDelimStringView(levelData[i + 1], '_');
             fillColorChannel(colorString, 1003);
         }
         else if (levelData[i] == "kS38")
         {
-            auto colorString = Common::splitByDelimStringView(levelData[i + 1], '|');
+            std::vector<std::string_view> colorString = Common::splitByDelimStringView(levelData[i + 1], '|');
             for (std::string_view colorData : colorString)
             {
-                auto innerData = Common::splitByDelimStringView(colorData, '_');
+                std::vector<std::string_view> innerData = Common::splitByDelimStringView(colorData, '_');
 
                 int key = 0;
                 sf::Color col;
@@ -540,11 +566,11 @@ void GameLayer::setupLevel(std::string_view levelString)
                         break;
                     case 9:
                     {
-                        int copyID = Common::stoi(innerData[j + 1]);
+                        copyID = Common::stoi(innerData[j + 1]);
                     }
                         break;
                     case 10:
-                        auto hsv = Common::splitByDelimStringView(innerData[j + 1], 'a');
+                        std::vector<std::string_view> hsv = Common::splitByDelimStringView(innerData[j + 1], 'a');
                         hsvModifier.h = Common::stof(hsv[0]);
                         hsvModifier.s = Common::stof(hsv[1]);
                         hsvModifier.v = Common::stof(hsv[2]);
@@ -554,7 +580,7 @@ void GameLayer::setupLevel(std::string_view levelString)
                     }
                 }
                 
-                auto channel = colorChannels[key];
+                std::shared_ptr<ColorChannel> channel = colorChannels[key];
                 channel->setColor(col);
                 channel->blending = blending;
                 channel->hsvModifier = hsvModifier;
@@ -621,12 +647,12 @@ void GameLayer::setupObjects(std::string_view levelString)
 
     objData.erase(objData.begin());
 
-    if (const auto& last = objData.back(); last.front() != '1' || last[1] != ',')
+    if (const std::string_view& last = objData.back(); last.front() != '1' || last[1] != ',')
         objData.pop_back();
 
-    for (const auto& objectDataSpecific : objData)
+    for (const std::string_view& objectDataSpecific : objData)
     {
-        auto obj = GameObject::createFromString(objectDataSpecific);
+        std::shared_ptr<GameObject> obj = GameObject::createFromString(objectDataSpecific);
         if (obj)
         {
             objects.push_back(obj);
@@ -644,13 +670,13 @@ void GameLayer::updateTriggers()
             auto section = sectionObjects[i];
             for (auto& pair : section)
             {
-                auto obj = pair.second;
-                if (obj->getPosition().x > camera.getCenter().x / Application::zoomModifier - 75.f)
+                GameObject* obj = pair.second;
+                if (obj->getPosition().x > camera.getCenter().x / Application::zoomModifier)
                     continue;
 
                 if (obj->isTrigger)
                 {
-                    auto tr = dynamic_cast<EffectGameObject*>(obj);
+                    EffectGameObject* tr = dynamic_cast<EffectGameObject*>(obj);
                     if(!tr->spawnTriggered && !tr->touchTriggered)
                         tr->triggerActivated();
                 }
@@ -692,9 +718,9 @@ void GameLayer::updateVisibility()
         auto section = &sectionObjects[this->prevSection - 1];
         for (auto pair : *section)
         {
-            auto obj = pair.second;
+            GameObject* obj = pair.second;
             obj->removeFromBatcher();
-            for (auto spr : obj->childSprites)
+            for (std::shared_ptr<Sprite> spr : obj->childSprites)
                 spr->removeFromBatcher();
         }
     }
@@ -704,9 +730,9 @@ void GameLayer::updateVisibility()
         auto section = &sectionObjects[this->nextSection + 1];
         for (auto pair : *section)
         {
-            auto obj = pair.second;
+            GameObject* obj = pair.second;
             obj->removeFromBatcher();
-            for (auto spr : obj->childSprites)
+            for (std::shared_ptr<Sprite> spr : obj->childSprites)
                 spr->removeFromBatcher();
         }
     }
@@ -720,7 +746,7 @@ void GameLayer::updateVisibility()
                 auto section = &sectionObjects[i];
                 for (auto pair : *section)
                 {
-                    auto obj = pair.second;
+                    GameObject* obj = pair.second;
 
                     if (!obj->enabled)
                     {
@@ -738,7 +764,7 @@ void GameLayer::updateVisibility()
 
                     obj->updateOpacity();
 
-                    for (auto& sprite : obj->childSprites)
+                    for (std::shared_ptr<Sprite>& sprite : obj->childSprites)
                         layerObject(sprite.get());
                     layerObject(obj);
                 }
@@ -820,7 +846,7 @@ void GameLayer::drawForObject(GameObject* object, int index)
         if (ImGui::IsItemClicked())
             selected = object;
 
-        for (auto& spr : object->childSprites)
+        for (std::shared_ptr<Sprite>& spr : object->childSprites)
         {
             drawForSprite(spr.get(), index);
             index++;
@@ -933,14 +959,14 @@ void GameLayer::drawInspector()
 
 void GameLayer::drawImGui()
 {
-    const auto avail = ImGui::GetWindowWidth();
+    const float avail = ImGui::GetWindowWidth();
     ImGui::Begin("Scene Inspector");
 
     int index = 0;
     ImGui::BeginChild("Hierarchy", ImVec2(avail, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-    for (auto& sprite : objects)
+    for (std::shared_ptr<GameObject>& object : objects)
     {
-        drawForObject(sprite.get(), index);
+        drawForObject(object.get(), index);
         index++;
     }
 
@@ -980,7 +1006,7 @@ void GameLayer::drawImGui()
         ImGui::TableSetupColumn("Color");
         ImGui::TableHeadersRow();
 
-        for (auto&channel : colorChannels)
+        for (std::shared_ptr<ColorChannel>&channel : colorChannels)
         {
             if (channel)
             {

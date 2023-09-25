@@ -10,9 +10,9 @@ nlohmann::json GameObject::objJson;
 
 void GameObject::setupCustomObjects(nlohmann::json& objectJson, std::shared_ptr<GameObject> parent)
 {
-	for (auto& sprite : objectJson["children"])
+	for (nlohmann::json& sprite : objectJson["children"])
 	{
-		auto spr = Sprite::create(sprite["texture"]);
+		std::shared_ptr<Sprite> spr = Sprite::create(sprite["texture"]);
 
 		spr->parent = this;
 
@@ -69,7 +69,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 		objJson = nlohmann::json::parse(file);
 	}
 
-	auto properties = Common::splitByDelimStringView(str, ',');
+	std::vector<std::string_view> properties = Common::splitByDelimStringView(str, ',');
 
 	int objID = Common::stoi(properties[1]);
 
@@ -188,7 +188,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 			effectPtr->triggerColor.a = Common::stof(properties[i + 1]) * 255.f;
 			break;
 		case 43: {
-			auto hsv = Common::splitByDelimStringView(properties[i + 1], 'a');
+			std::vector<std::string_view> hsv = Common::splitByDelimStringView(properties[i + 1], 'a');
 			ptr->primaryHSV.h = Common::stof(hsv[0]);
 			ptr->primaryHSV.s = Common::stof(hsv[1]);
 			ptr->primaryHSV.v = Common::stof(hsv[2]);
@@ -197,7 +197,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 		}
 			   break;
 		case 44: {
-			auto hsv = Common::splitByDelimStringView(properties[i + 1], 'a');
+			std::vector<std::string_view> hsv = Common::splitByDelimStringView(properties[i + 1], 'a');
 			ptr->secondaryHSV.h = Common::stof(hsv[0]);
 			ptr->secondaryHSV.s = Common::stof(hsv[1]);
 			ptr->secondaryHSV.v = Common::stof(hsv[2]);
@@ -218,7 +218,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 			effectPtr->pulseMode = Common::stoi(properties[i + 1]);
 			break;
 		case 49: {
-			auto hsv = Common::splitByDelimStringView(properties[i + 1], 'a');
+			std::vector<std::string_view> hsv = Common::splitByDelimStringView(properties[i + 1], 'a');
 			effectPtr->copyColorHSV.h = Common::stof(hsv[0]);
 			effectPtr->copyColorHSV.s = Common::stof(hsv[1]);
 			effectPtr->copyColorHSV.v = Common::stof(hsv[2]);
@@ -242,7 +242,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 			break;
 		case 57:
 		{
-			auto groups = Common::splitByDelimStringView(properties[i + 1], '.');
+			std::vector<std::string_view> groups = Common::splitByDelimStringView(properties[i + 1], '.');
 			ptr->groups.reserve(groups.size());
 			for (std::string_view groupStr : groups)
 			{
@@ -342,7 +342,7 @@ void GameObject::updateOpacity()
 
 	setOpacity(opacity);
 
-	for (auto& sprite : childSprites)
+	for (std::shared_ptr<Sprite>& sprite : childSprites)
 	{
 		sprite->opacityMultiplier = opacityMultiplier;
 		sprite->setOpacity(sprite->opacity);
@@ -365,7 +365,7 @@ void GameObject::updatePosition()
 
 	for (int i : groups)
 	{
-		auto group = GameLayer::instance->groups[i];
+		std::shared_ptr<Group> group = GameLayer::instance->groups[i];
 		rotate += group->rotateTotal;
 
 		if (group->rotateAround)
@@ -388,9 +388,11 @@ void GameObject::updatePosition()
 
 	this->updateVerticesPosition();
 
-	for (auto child : childSprites)
+	for (std::shared_ptr<Sprite> child : childSprites)
 		child->updateVerticesPosition();
 }
+
+
 
 void GameObject::tryUpdateSection()
 {
@@ -423,7 +425,7 @@ void GameObject::tryUpdateSection()
 
 		for (int i : groups)
 		{
-			auto group = GameLayer::instance->groups[i];
+			std::shared_ptr<Group> group = GameLayer::instance->groups[i];
 			auto groupMap = &group->objects[oldSection];
 
 			groupMap->erase(uniqueID);
@@ -437,7 +439,7 @@ void GameObject::tryUpdateSection()
 		}
 
 		addToChannelSection();
-		for (auto spr : childSprites)
+		for (std::shared_ptr<Sprite> spr : childSprites)
 			spr->addToChannelSection();
 	}
 }

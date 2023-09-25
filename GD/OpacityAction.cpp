@@ -25,14 +25,14 @@ bool OpacityAction::init(float duration, int group, float from, float to)
 
 void OpacityAction::update(float time)
 {
-	auto groupPtr = GameLayer::instance->groups[this->group];
+	std::shared_ptr<Group> groupPtr = GameLayer::instance->groups[this->group];
 	groupPtr->groupOpacity = to - delta * (1 - time);
 
 	for (int i = GameLayer::instance->prevSection; i < GameLayer::instance->nextSection + 1; i++)
 	{
 		for (auto pair : groupPtr->objects[i])
 		{
-			auto obj = pair.second;
+			GameObject* obj = pair.second;
 			obj->updateOpacity();
 		}
 	}

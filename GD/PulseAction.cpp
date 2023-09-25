@@ -66,7 +66,7 @@ void PulseAction::update(float time)
 			float fadetime = time / fadein;
 			if (fadein == 0)
 				fadetime = 1.f;
-			auto channel = GameLayer::instance->colorChannels[target];
+			std::shared_ptr<ColorChannel> channel = GameLayer::instance->colorChannels[target];
 			sf::Uint8 r = static_cast<sf::Uint8>(to.r - deltar * (1 - fadetime));
 			sf::Uint8 g = static_cast<sf::Uint8>(to.g - deltag * (1 - fadetime));
 			sf::Uint8 b = static_cast<sf::Uint8>(to.b - deltab * (1 - fadetime));
@@ -79,7 +79,7 @@ void PulseAction::update(float time)
 			if (fadeout == 0)
 				fadetime = 1.f;
 
-			auto channel = GameLayer::instance->colorChannels[target];
+			std::shared_ptr<ColorChannel> channel = GameLayer::instance->colorChannels[target];
 			sf::Uint8 r = static_cast<sf::Uint8>(original.r - deltar2 * (1 - fadetime));
 			sf::Uint8 g = static_cast<sf::Uint8>(original.g - deltag2 * (1 - fadetime));
 			sf::Uint8 b = static_cast<sf::Uint8>(original.b - deltab2 * (1 - fadetime));
@@ -94,13 +94,13 @@ void PulseAction::update(float time)
 			float fadetime = time / fadein;
 			if (fadein == 0)
 				fadetime = 1.f;
-			auto group = GameLayer::instance->groups[target];
+			std::shared_ptr<Group> group = GameLayer::instance->groups[target];
 
 			for (int i = GameLayer::instance->prevSection; i < GameLayer::instance->nextSection + 1; i++)
 			{
 				for (auto pair : group->objects[i])
 				{
-					auto obj = pair.second;
+					GameObject* obj = pair.second;
 					applyToSpriteIn(obj, fadetime);
 					for (auto spr : obj->childSprites)
 						applyToSpriteIn(spr.get(), fadetime);
@@ -112,12 +112,12 @@ void PulseAction::update(float time)
 			float fadetime = (time - hold - fadein) / fadeout;
 			if (fadeout == 0)
 				fadetime = 1.f;
-			auto group = GameLayer::instance->groups[target];
+			std::shared_ptr<Group> group = GameLayer::instance->groups[target];
 			for (int i = GameLayer::instance->prevSection; i < GameLayer::instance->nextSection + 1; i++)
 			{
 				for (auto pair : group->objects[i])
 				{
-					auto obj = pair.second;
+					GameObject* obj = pair.second;
 					applyToSpriteOut(obj, fadetime);
 					for (auto spr : obj->childSprites)
 						applyToSpriteOut(spr.get(), fadetime);
@@ -126,12 +126,12 @@ void PulseAction::update(float time)
 		}
 		else
 		{
-			auto group = GameLayer::instance->groups[target];
+			std::shared_ptr<Group> group = GameLayer::instance->groups[target];
 			for (int i = GameLayer::instance->prevSection; i < GameLayer::instance->nextSection + 1; i++)
 			{
 				for (auto pair : group->objects[i])
 				{
-					auto obj = pair.second;
+					GameObject* obj = pair.second;
 					applyToSpriteIn(obj, fadein + hold);
 					for (auto spr : obj->childSprites)
 						applyToSpriteIn(spr.get(), fadein + hold);

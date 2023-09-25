@@ -24,7 +24,7 @@ void SpawnAction::spawn()
 	{
 		for (auto pair2 : pair.second)
 		{
-			auto obj = pair2.second;
+			GameObject* obj = pair2.second;
 			if (obj->isTrigger)
 			{
 				auto trigger = dynamic_cast<EffectGameObject*>(obj);

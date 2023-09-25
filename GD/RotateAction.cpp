@@ -9,7 +9,7 @@ void RotateAction::stop()
     {
         for (auto pair2 : pair.second)
         {
-            auto obj = pair2.second;
+            GameObject* obj = pair2.second;
             sf::Vector2f move = obj->startPosition;
 
             for (int i : obj->groups)
@@ -87,7 +87,7 @@ void RotateAction::update(float time)
     if (!lockRotation)
         targetGroup->rotateTotal -= deltaRotation;
 
-    auto dirty = &GameLayer::instance->dirtyGroups;
+    std::vector<int> *dirty = &GameLayer::instance->dirtyGroups;
     if (std::find(dirty->begin(), dirty->end(), groupID) == dirty->end())
         dirty->push_back(groupID);
 }

@@ -2,6 +2,8 @@
 #include "GameLayer.h"
 #include "ActionEasing.h"
 
+#define gameLayer GameLayer::instance //lol
+
 void EffectGameObject::triggerActivated()
 {
 	if(wasTriggerActivated)
@@ -16,8 +18,6 @@ void EffectGameObject::triggerActivated()
 		targetColorId = 1001;
 	else if (objectID == 105)
 		targetColorId = 1004;
-
-	auto gameLayer = GameLayer::instance;
 	
 	switch (objectID)
 	{
@@ -25,118 +25,183 @@ void EffectGameObject::triggerActivated()
 	case 30:
 	case 105:
 	case 899:
-	{
-		//if (!gameLayer->colorChannels[targetColorId])
-			//return;
-
-		auto foundAction = gameLayer->colorChannels[targetColorId]->colorActionChannel;
-		if (foundAction)
-			foundAction->stop();
-
-		if (gameLayer->colorChannels[targetColorId]->blending != blending)
-		{
-			gameLayer->colorChannels[targetColorId]->blending = blending;
-			for (int i = gameLayer->prevSection; i < gameLayer->nextSection + 1; i++)
-			{
-				for (auto pair : gameLayer->colorChannels[targetColorId]->channelSprites[i])
-				{
-					auto spr = pair.second;
-					spr->removeFromBatcher();
-					gameLayer->layerObject(spr);
-				}
-			}
-		}
-
-		if (copyColorID <= 0)
-		{
-			auto createdAction = ColorAction::create(duration, targetColorId, gameLayer->colorChannels[targetColorId]->getColor(), triggerColor);
-			if (gameLayer->colorChannels[targetColorId]->copyColor)
-			{
-				auto copiers = &gameLayer->colorChannels[targetColorId]->copyColor->copiers;
-				auto foundInd = std::find(copiers->begin(), copiers->end(), gameLayer->colorChannels[targetColorId].get());
-				if (foundInd != copiers->end())
-					copiers->erase(foundInd);
-
-				gameLayer->colorChannels[targetColorId]->copyColor = nullptr;
-			}
-			gameLayer->colorChannels[targetColorId]->colorActionChannel = createdAction;
-			gameLayer->colorActionsActive.push_back(createdAction);
-		}
-		else
-		{
-			if (!gameLayer->colorChannels[copyColorID])
-				return;
-			auto createdAction = CopyColorAction::create(duration, gameLayer->colorChannels[targetColorId].get(), gameLayer->colorChannels[copyColorID].get(), copyColorHSV, targetColorId);
-			gameLayer->colorChannels[targetColorId]->colorActionChannel = createdAction;
-			gameLayer->copyColorActionsActive.push_back(createdAction);
-		}
+		colorAction();
 		break;
-	}
 	case 1006:
-	{
-		//if (pulseType == 0 && !gameLayer->colorChannels[targetGroupId])
-			//return;
-
-		if (pulseMode == 1)
-		{
-			copyColorID = copyColorID == -2 ? targetGroupId : copyColorID;
-			//if (!gameLayer->colorChannels[copyColorID])
-				//return;
-
-			sf::Color copyColor = gameLayer->colorChannels[copyColorID] ? gameLayer->colorChannels[copyColorID]->getColor() : sf::Color::White;
-			triggerColor = HSV::combine(copyColor, copyColorHSV);
-		}
-
-		sf::Color fromColor = pulseType == 0 ? gameLayer->colorChannels[targetGroupId]->getColor() : sf::Color::White;
-		sf::Color originalColor = pulseType == 0 ? gameLayer->colorChannels[targetGroupId]->getNonPulseColor() : sf::Color::White;
-
-		gameLayer->pulseActionsActive.push_back(PulseAction::create(fadeIn, hold, fadeOut, targetGroupId, fromColor, triggerColor, originalColor, pulseType, mainOnly, detailOnly));
+		pulseAction();
 		break;
-	}
 	case 1007:
-
-		gameLayer->opacityActionsActive.push_back(OpacityAction::create(duration, targetGroupId, gameLayer->groups[targetGroupId]->groupOpacity, triggerColor.a / 255.f));
+		opacityAction();
 		break;
 	case 901:
-	{
-		auto moveAction = MoveAction::create(duration, targetGroupId, movement, lockPlayerX, lockPlayerY);
-
-		if(moveAction)
-			gameLayer->moveActionsActive.push_back(actionEasing(moveAction, easeRate));
-	}
+		moveAction();
 		break;
 	case 1049:
-		for (auto pair : gameLayer->groups[targetGroupId]->objects)
-		{
-			for (auto pair2 : pair.second)
-			{
-				auto obj = pair2.second;
-				obj->enabled = activateGroup;
-			}
-		}
+		toggleAction();
 		break;
 	case 1268:
-	{
-		auto spawn = SpawnAction::create(spawnDelay, gameLayer->groups[targetGroupId]);
-		if (spawn)
-			gameLayer->spawnActionsActive.push_back(spawn);
-	}
+		spawnAction();
 		break;
 	case 1346:
-	{
-		if (gameLayer->groups[targetGroupId]->rotateAction != nullptr)
-			gameLayer->groups[targetGroupId]->rotateAction->stop();
-
-		auto rotateAction = RotateAction::create(duration, targetGroupId, secondaryTargetGroupId, (360 * times360) + degrees, lockRotation);
-		if (!rotateAction)
-			return;
-		auto ease = actionEasing(rotateAction, easeRate);
-		gameLayer->groups[targetGroupId]->rotateAction = ease;
-		gameLayer->rotateActionsActive.push_back(ease);
-	}
+		rotateAction();
+		break;
+	case 1616:
+		stopAction();
 		break;
 	}
 }
+
+void EffectGameObject::colorAction() 
+{
+	std::shared_ptr<ActionInterval> foundAction = gameLayer->colorChannels[targetColorId]->colorActionChannel;
+	if (foundAction)
+		foundAction->stop();
+
+	if (gameLayer->colorChannels[targetColorId]->blending != blending)
+	{
+		gameLayer->colorChannels[targetColorId]->blending = blending;
+		for (int i = gameLayer->prevSection; i < gameLayer->nextSection + 1; i++)
+		{
+			for (auto pair : gameLayer->colorChannels[targetColorId]->channelSprites[i])
+			{
+				Sprite* spr = pair.second;
+				spr->removeFromBatcher();
+				gameLayer->layerObject(spr);
+			}
+		}
+	}
+
+	if (copyColorID <= 0)
+	{
+		auto colorAction = ColorAction::create(duration, targetColorId, gameLayer->colorChannels[targetColorId]->getColor(), triggerColor);
+		if (gameLayer->colorChannels[targetColorId]->copyColor)
+		{
+			std::vector<ColorChannel*> *copiers = &gameLayer->colorChannels[targetColorId]->copyColor->copiers;
+			auto foundInd = std::find(copiers->begin(), copiers->end(), gameLayer->colorChannels[targetColorId].get());
+			if (foundInd != copiers->end())
+				copiers->erase(foundInd);
+
+			gameLayer->colorChannels[targetColorId]->copyColor = nullptr;
+		}
+		gameLayer->colorChannels[targetColorId]->colorActionChannel = colorAction;
+		gameLayer->colorActionsActive.push_back(colorAction);
+		this->triggerAction = colorAction;
+	}
+	else
+	{
+		if (!gameLayer->colorChannels[copyColorID])
+			return;
+		std::shared_ptr<CopyColorAction> copyColorAction = CopyColorAction::create(duration, gameLayer->colorChannels[targetColorId].get(), gameLayer->colorChannels[copyColorID].get(), copyColorHSV, targetColorId);
+		gameLayer->colorChannels[targetColorId]->colorActionChannel = copyColorAction;
+		gameLayer->copyColorActionsActive.push_back(copyColorAction);
+		this->triggerAction = copyColorAction;
+	}
+}
+
+
+
+
+void EffectGameObject::pulseAction()
+{
+	if (pulseMode == 1)
+	{
+		copyColorID = copyColorID == -2 ? targetGroupId : copyColorID;
+		sf::Color copyColor = gameLayer->colorChannels[copyColorID] ? gameLayer->colorChannels[copyColorID]->getColor() : sf::Color::White;
+		triggerColor = HSV::combine(copyColor, copyColorHSV);
+	}
+
+	sf::Color fromColor = pulseType == 0 ? gameLayer->colorChannels[targetGroupId]->getColor() : sf::Color::White;
+	sf::Color originalColor = pulseType == 0 ? gameLayer->colorChannels[targetGroupId]->getNonPulseColor() : sf::Color::White;
+
+	std::shared_ptr<PulseAction> pulseAction = PulseAction::create(fadeIn, hold, fadeOut, targetGroupId, fromColor, triggerColor, originalColor, pulseType, mainOnly, detailOnly);
+
+	gameLayer->pulseActionsActive.push_back(pulseAction);
+	this->triggerAction = pulseAction;
+}
+
+
+
+void EffectGameObject::opacityAction()
+{
+	std::shared_ptr<OpacityAction> opacityAction = OpacityAction::create(duration, targetGroupId, gameLayer->groups[targetGroupId]->groupOpacity, triggerColor.a / 255.f);
+	gameLayer->opacityActionsActive.push_back(opacityAction);
+	this->triggerAction = opacityAction;
+}
+
+
+
+void EffectGameObject::moveAction()
+{
+	std::shared_ptr<MoveAction> moveAction = MoveAction::create(duration, targetGroupId, movement, lockPlayerX, lockPlayerY);
+
+	gameLayer->moveActionsActive.push_back(actionEasing(moveAction, easeRate));
+
+	this->triggerAction = moveAction;
+}
+
+
+
+void EffectGameObject::toggleAction()
+{
+	for (auto pair : gameLayer->groups[targetGroupId]->objects)
+	{
+		for (auto pair2 : pair.second)
+		{
+			GameObject* obj = pair2.second;
+			obj->enabled = activateGroup;
+		}
+	}
+}
+
+
+
+void EffectGameObject::spawnAction()
+{
+	std::shared_ptr<SpawnAction> spawnAction = SpawnAction::create(spawnDelay, gameLayer->groups[targetGroupId]);
+	
+	gameLayer->spawnActionsActive.push_back(spawnAction);
+
+	this->triggerAction = spawnAction;
+}
+
+
+
+void EffectGameObject::rotateAction()
+{
+	if (gameLayer->groups[targetGroupId]->rotateAction != nullptr)
+		gameLayer->groups[targetGroupId]->rotateAction->stop();
+
+	std::shared_ptr<RotateAction> rotateAction = RotateAction::create(duration, targetGroupId, secondaryTargetGroupId, (360 * times360) + degrees, lockRotation);
+
+	if (!rotateAction)
+		return;
+
+	std::shared_ptr<ActionInterval> easeAction = actionEasing(rotateAction, easeRate);
+	gameLayer->groups[targetGroupId]->rotateAction = easeAction;
+	gameLayer->rotateActionsActive.push_back(easeAction);
+	this->triggerAction = easeAction;
+}
+
+
+
+void EffectGameObject::stopAction()
+{
+	std::shared_ptr<Group> group = gameLayer->groups[targetGroupId];
+	for (auto pair : group->objects)
+	{
+		for (auto pair2 : pair.second)
+		{
+			GameObject* obj = pair2.second;
+			if (obj->isTrigger)
+			{
+				EffectGameObject* trigger = dynamic_cast<EffectGameObject*>(obj);
+				trigger->triggerAction->stop();
+			}
+		}
+	}
+}
+
+
 
 std::shared_ptr<ActionInterval> EffectGameObject::actionEasing(std::shared_ptr<ActionInterval> base, float rate)
 {

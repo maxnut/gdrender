@@ -27,8 +27,19 @@ public:
 	sf::Color triggerColor = sf::Color::Green;
 
 	sf::Vector2f movement;
+
+	std::shared_ptr<ActionInterval> triggerAction;
 public:
 	void triggerActivated();
+
+	void colorAction();
+	void pulseAction();
+	void opacityAction();
+	void moveAction();
+	void toggleAction();
+	void spawnAction();
+	void rotateAction();
+	void stopAction();
 
 	std::shared_ptr<ActionInterval> actionEasing(std::shared_ptr<ActionInterval> base, float rate = 0);
 };
