@@ -28,7 +28,7 @@ std::shared_ptr<GameLayer> GameLayer::create(int levelID)
 
 bool GameLayer::init(int levelID)
 {
-    camera = sf::View(sf::FloatRect(-800.f, -950.f, 1920, 1080));
+    camera = sf::View(sf::FloatRect(-950.f, -950.f, 1920, 1080));
     //camera.zoom(0.3f);
 
     instance = this;

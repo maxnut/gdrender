@@ -14,6 +14,9 @@ void Application::start()
 {
     instance = this;
 
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 4;
+
     window = new sf::RenderWindow(sf::VideoMode::getDesktopMode(), "GD", sf::Style::Fullscreen);
     renderTexture.create(1920, 1080);
     window->setFramerateLimit(50000);
