@@ -195,7 +195,9 @@ void EffectGameObject::stopAction()
 			if (obj->isTrigger)
 			{
 				EffectGameObject* trigger = dynamic_cast<EffectGameObject*>(obj);
-				trigger->triggerAction->stop();
+
+				if(trigger->triggerAction)
+					trigger->triggerAction->stop();
 			}
 		}
 	}
