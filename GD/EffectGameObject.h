@@ -10,6 +10,7 @@ public:
 	bool lockPlayerX, lockPlayerY;
 	bool activateGroup, spawnTriggered, multiActivate, touchTriggered;
 	bool lockRotation;
+	bool triedToActivate;
 
 	float duration = 0.5f;
 	float easeRate = 1.f;

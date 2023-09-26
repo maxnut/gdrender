@@ -149,6 +149,13 @@ void EffectGameObject::toggleAction()
 		{
 			GameObject* obj = pair2.second;
 			obj->enabled = activateGroup;
+
+			if (!activateGroup)
+			{
+				obj->removeFromBatcher();
+				for (std::shared_ptr<Sprite> sprite : obj->childSprites)
+					sprite->removeFromBatcher();
+			}
 		}
 	}
 }

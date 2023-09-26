@@ -118,7 +118,7 @@ void GameLayer::update()
     {
         audioEngine->play();
         audioEngine->setPosition(musicOffset);
-        audioEngine->setVolume(0.1f);
+        audioEngine->setVolume(0.15f);
     }
 
     moveCamera();
@@ -663,7 +663,11 @@ void GameLayer::setupObjects(std::string_view levelString)
 
 void GameLayer::updateTriggers()
 {
-    for (int i = prevSection; i < nextSection; i++)
+    auto camPos = camera.getCenter().x / Application::zoomModifier;
+
+    int curSection = Common::sectionForPos(camPos);
+
+    for (int i = prevSection; i < curSection; i++)
     {
         if (i < sectionObjects.size() && i >= 0)
         {
@@ -677,8 +681,13 @@ void GameLayer::updateTriggers()
                 if (obj->isTrigger)
                 {
                     EffectGameObject* tr = dynamic_cast<EffectGameObject*>(obj);
-                    if(!tr->spawnTriggered && !tr->touchTriggered)
-                        tr->triggerActivated();
+                    if (tr->enabled)
+                    {
+                        if (!tr->spawnTriggered && !tr->touchTriggered && !tr->triedToActivate)
+                            tr->triggerActivated();
+                    }
+                    else
+                        tr->triedToActivate = true;
                 }
                 else if (obj->objectID == 200)
                 {
@@ -748,13 +757,7 @@ void GameLayer::updateVisibility()
                 {
                     GameObject* obj = pair.second;
 
-                    if (!obj->enabled)
-                    {
-                        obj->removeFromBatcher();
-                        continue;
-                    }
-
-                    if (!obj || obj->currentBatcher != nullptr)
+                    if (!obj || obj->currentBatcher != nullptr || !obj->enabled)
                         continue;
 
                     obj->updatePosition();
