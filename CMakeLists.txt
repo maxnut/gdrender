@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 3.20)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 project(gdrender)
+
+include(get_cpm.cmake)
 
 add_executable(gdrender
     GD/ActionEasing.cpp
@@ -44,30 +48,30 @@ add_executable(gdrender
     GD/Tween.cpp
 )
 
+CPMAddPackage("gh:SFML/SFML#2.6.x")
+CPMAddPackage("gh:libcpr/cpr#1.10.4")
+
 target_include_directories(gdrender PRIVATE
     GD/include
     GD/include/imgui
     GD/include/imgui-SFML
-    GD/include/SFML
     GD/include/fmod
 )
 
 target_link_libraries(gdrender
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/sfml-system.lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/sfml-graphics.lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/sfml-window.lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/sfml-audio.lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/sfml-network.lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/zlib.lib
     ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/fmod_vc.lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/cpr.lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/libcurl.lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/flac.lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/freetype.lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/ogg.lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/openal32.lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/vorbis.lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/vorbisenc.lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/vorbisfile.lib
+    sfml-graphics
+    cpr::cpr
     opengl32
+    zlib
 )
+
+if(WIN32)
+    add_custom_command(
+        TARGET gdrender
+        COMMENT "Copy OpenAL DLL"
+        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:gdrender>
+        VERBATIM)
+endif()
+
+install(TARGETS gdrender)
