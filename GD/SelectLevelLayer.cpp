@@ -23,6 +23,9 @@ bool SelectLevelLayer::init()
 	ImageLoader::ParsePlist("Resources\\GJ_GameSheet03-uhd.plist");
 	ImageLoader::ParsePlist("Resources\\GJ_GameSheet04-uhd.plist");
 
+	searchStr[0] = 0;
+	searchStrPersistent[0] = 0;
+
 	return true;
 }
 
@@ -33,14 +36,14 @@ void SelectLevelLayer::draw()
 
 	ImGui::Begin("Select Level", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoResize);
 
-	ImGui::InputText("Search", searchStr, 50);
+	ImGui::InputText("Search", searchStr.data(), searchStr.size());
 
 	if (ImGui::Button("Load Level"))
 	{
 		page = 0;
 		levels.clear();
-		searchLevels(searchStr, page);
-		memcpy(searchStrPersistent, searchStr, 50);
+		searchLevels(searchStr.data(), page);
+		memcpy(searchStrPersistent.data(), searchStr.data(), searchStr.size());
 	}
 
 	ImGui::SameLine();
@@ -48,7 +51,7 @@ void SelectLevelLayer::draw()
 	if (ImGui::Button("More"))
 	{
 		page++;
-		searchLevels(searchStrPersistent, page);
+		searchLevels(searchStrPersistent.data(), page);
 	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, { 10, 10 });

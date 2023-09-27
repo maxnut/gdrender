@@ -3,13 +3,15 @@
 #include "Layer.h"
 #include "Level.h"
 
+#include <array>
+
 class SelectLevelLayer : public Layer
 {
 private:
 	std::vector<GameLevel> levels;
 
-	char searchStr[50];
-	char searchStrPersistent[50];
+	std::array<char, 50> searchStr;
+	std::array<char, 50> searchStrPersistent;
 
 	int page = 1;
 public:
