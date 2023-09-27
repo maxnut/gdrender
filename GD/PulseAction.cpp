@@ -37,7 +37,7 @@ bool PulseAction::init(float fadein, float hold, float fadeout, int target, sf::
 
 void PulseAction::applyToSpriteIn(Sprite* spr, float fadetime)
 {
-	if (spr->channelType == 1 && detailOnly || spr->channelType == 2 && mainOnly || spr->channelType == 0)
+	if (spr->channel == nullptr || spr->channelType == 1 && detailOnly || spr->channelType == 2 && mainOnly || spr->channelType == 0)
 		return;
 	auto channelcolor = spr->channel->getColor();
 	auto r1 = static_cast<sf::Uint8>(to.r - (float)(to.r - channelcolor.r) * (1 - fadetime));
@@ -48,7 +48,7 @@ void PulseAction::applyToSpriteIn(Sprite* spr, float fadetime)
 
 void PulseAction::applyToSpriteOut(Sprite* spr, float fadetime)
 {
-	if (spr->channelType == 1 && detailOnly || spr->channelType == 2 && mainOnly || spr->channelType == 0)
+	if (spr->channel == nullptr || spr->channelType == 1 && detailOnly || spr->channelType == 2 && mainOnly || spr->channelType == 0)
 		return;
 	auto channelcolor = spr->channel->getColor();
 	auto r1 = static_cast<sf::Uint8>(to.r - (float)(to.r - channelcolor.r) * (fadetime));
