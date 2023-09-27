@@ -110,7 +110,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 	
 
 	ptr->zLayer = objectEntry["default_z_layer"];
-	if(objectEntry.contains("default_base_color_channel"))
+	if (objectEntry.contains("default_base_color_channel"))
 		ptr->primaryColorChannel = objectEntry["default_base_color_channel"];
 	if (objectEntry.contains("default_detail_color_channel"))
 	ptr->secondaryColorChannel = objectEntry["default_detail_color_channel"];
@@ -379,7 +379,7 @@ void GameObject::updatePosition()
 			sf::Transform transform;
 			transform.rotate(rotationAngle, rotationPoint);
 
-			newPosition += group->rotateAround->getPosition() - group->rotateAround->startPosition;
+			//newPosition += group->rotateAround->getPosition() - group->rotateAround->startPosition;
 			newPosition = transform.transformPoint(newPosition);
 		}
 	}

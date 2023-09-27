@@ -5,16 +5,16 @@
 class Application
 {
 private:
-	std::shared_ptr<Layer> currentLayer;
+	std::shared_ptr<Layer> currentLayer = nullptr;
 
-	std::shared_ptr<Layer> pendingLayer;
+	std::shared_ptr<Layer> pendingLayer = nullptr;
 
 	sf::Clock deltaClock;
 public:
 	std::map<sf::Keyboard::Key, bool> keyPressedMap;
-	sf::RenderWindow* window;
+	sf::RenderWindow* window = nullptr;
 	sf::RenderTexture renderTexture;
-	float deltaTime;
+	float deltaTime = 0;
 
 	static const float zoomModifier;
 

@@ -7,9 +7,9 @@
 
 class AudioEngine {
 private:
-    FMOD::System* system;
-    FMOD::Sound* sound;
-    FMOD::Channel* channel;
+    FMOD::System* system = nullptr;
+    FMOD::Sound* sound = nullptr;
+    FMOD::Channel* channel = nullptr;
 public:
     bool isPlaying;
 public:

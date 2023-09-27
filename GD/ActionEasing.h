@@ -5,7 +5,7 @@
 class ActionEasing : public ActionInterval
 {
 protected:
-    std::shared_ptr<ActionInterval> innerAction;
+    std::shared_ptr<ActionInterval> innerAction = nullptr;
 public:
     static std::shared_ptr<ActionEasing> create(std::shared_ptr<ActionInterval> inner);
 
