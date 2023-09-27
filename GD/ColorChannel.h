@@ -21,7 +21,7 @@ public:
 	ColorChannel* copyColor = nullptr;
 	std::vector<ColorChannel*> copiers;
 
-	int id;
+	int id = 0;
 
 	HSV hsvModifier;
 public:

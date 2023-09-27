@@ -163,9 +163,7 @@ void Sprite::removeFromChannel()
     if (!channel)
         return;
 
-    auto map = &channel->channelSprites[parent->section];
-
-    map->erase(uniqueID);
+    channel->channelSprites[parent->section].erase(uniqueID);
 }
 
 void Sprite::addToChannelSection()

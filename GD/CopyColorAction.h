@@ -7,9 +7,9 @@ class CopyColorAction : public ActionInterval
 {
 private:
 
-	int colorChannelID;
+	int colorChannelID = 0;
 	sf::Color from;
-	ColorChannel* targetChannel, *copyColor;
+	ColorChannel* targetChannel = nullptr, *copyColor = nullptr;
 	HSV hsvModifier;
 public:
 	static std::shared_ptr<CopyColorAction> create(float duration, ColorChannel* target, ColorChannel* copy, HSV hsvModifier, int colorChannelID);

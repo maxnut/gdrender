@@ -24,8 +24,8 @@ public:
 	sf::Vector2f startPosition;
 	sf::Vector2f rotateOffsetMovement;
 
-	float rotateOffset;
-	float startRotation;
+	float rotateOffset = 0.f;
+	float startRotation = 0.f;
 public:
 	GameObject() : Sprite() {}
 
