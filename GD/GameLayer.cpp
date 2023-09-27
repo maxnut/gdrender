@@ -379,7 +379,7 @@ void GameLayer::loadLevel(std::string levelId)
         groups[i] = Group::create();
     }
 
-    std::string levelString;
+    std::string levelString = "";
     std::string_view levelStringView = "";
 
     if (std::stoi(levelId) > 25)
@@ -416,6 +416,7 @@ void GameLayer::loadLevel(std::string levelId)
     }
 
     levelString = GameLevel::decompressLvlStr(levelString);
+
     levelStringView = levelString;
 
     setupLevel(levelStringView);
@@ -643,12 +644,12 @@ void GameLayer::setupObjects(std::string_view levelString)
 {
     std::vector<std::string_view> objData = Common::splitByDelimStringView(levelString, ';');
 
-    objects.reserve(objData.size());
-
     objData.erase(objData.begin());
 
     if (const std::string_view& last = objData.back(); last.front() != '1' || last[1] != ',')
         objData.pop_back();
+
+    objects.reserve(objData.size());
 
     for (const std::string_view& objectDataSpecific : objData)
     {
@@ -767,9 +768,9 @@ void GameLayer::updateVisibility()
 
                     obj->updateOpacity();
 
+                    layerObject(obj);
                     for (std::shared_ptr<Sprite>& sprite : obj->childSprites)
                         layerObject(sprite.get());
-                    layerObject(obj);
                 }
             }
         }
@@ -958,6 +959,12 @@ void GameLayer::drawInspector()
 
     text << "Texture Size: " << selected->texDef->textureRect.width << " " << selected->texDef->textureRect.height << "##" << (int)selected;
     ImGui::Text(text.str().c_str());
+
+    text.clear();
+    text.str("");
+
+    text << "Z Order: " << selected->parent->zOrder;
+    ImGui::Text(text.str().c_str());
 }
 
 void GameLayer::drawImGui()
@@ -967,11 +974,11 @@ void GameLayer::drawImGui()
 
     int index = 0;
     ImGui::BeginChild("Hierarchy", ImVec2(avail, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-    for (std::shared_ptr<GameObject>& object : objects)
-    {
-        drawForObject(object.get(), index);
-        index++;
-    }
+   for(auto obj : objects)
+        {
+            drawForObject(obj.get(), index);
+            index++;
+        }
 
     ImGui::EndChild();
 

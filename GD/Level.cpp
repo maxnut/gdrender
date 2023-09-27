@@ -24,7 +24,7 @@ std::string GameLevel::decompressLvlStr(std::string compressedLvlStr)
 	unsigned char* a = nullptr;
 	int64_t deflatedLen = Common::inflateMemory(data, decoded.length(), &a);
 
-	std::string levelString = (char*)a;
+	std::string levelString = std::string((const char*)a, deflatedLen);
 
 	free(a);
 
