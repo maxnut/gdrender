@@ -6,7 +6,7 @@ class HSV
 {
 public:
 	float h = 0, s = 0, v = 0;
-	bool sChecked, vChecked;
+	bool sChecked{}, vChecked{};
 
 public:
 	HSV(float h, float s, float v, bool sc, bool vc) : h(h), s(s), v(v), sChecked(sc), vChecked(vc) {}

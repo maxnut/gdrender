@@ -35,7 +35,7 @@ bool GameLayer::init(int levelID)
 
     instance = this;
 
-    font.loadFromFile("arial.ttf");
+    font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf");
     framerate.setFont(font);
     framerate.setCharacterSize(24);
 

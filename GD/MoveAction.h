@@ -7,7 +7,7 @@ class MoveAction : public ActionInterval
 {
 private:
 	int groupID = -1;
-	Group* targetGroup;
+	Group* targetGroup = nullptr;
 
 	sf::Vector2f moveTotal = {0, 0}, moveLast = {0, 0};
 

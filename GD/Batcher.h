@@ -9,7 +9,7 @@ class Batcher : public sf::Drawable, public sf::Transformable
 private:
     static std::map<std::string, std::shared_ptr<sf::Texture>> images;
     
-    sf::Texture* texture;
+    sf::Texture* texture = nullptr;
 
     std::vector<Sprite*> sprites;
 

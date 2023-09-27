@@ -71,6 +71,9 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 
 	std::vector<std::string_view> properties = Common::splitByDelimStringView(str, ',');
 
+	if (properties.size() <= 1)
+		return nullptr;
+
 	int objID = Common::stoi(properties[1]);
 
 	if (!objJson.contains(properties[1]))

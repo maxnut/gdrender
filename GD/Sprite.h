@@ -23,9 +23,9 @@ public:
 
     sf::Vector2f anchor = { 0, 0 }, half = { 0, 0 };
 
-    TextureDefinition* texDef;
-    ColorChannel* channel;
-    GameObject* parent;
+    TextureDefinition* texDef = nullptr;
+    ColorChannel* channel = nullptr;
+    GameObject* parent = nullptr;
     Batcher* currentBatcher = nullptr;
     HSV* hsvModifier = nullptr;
 
