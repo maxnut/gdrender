@@ -18,6 +18,8 @@ public:
 
 	static const float zoomModifier;
 
+	int framerate = 240.f;
+
 	static Application* instance;
 public:
 	void start();

@@ -5,6 +5,7 @@
 #include "GameLayer.h"
 #include "LongData.h"
 #include "EffectGameObject.h"
+#include "tsl/ordered_map.h"
 
 nlohmann::json GameObject::objJson;
 
@@ -419,7 +420,7 @@ void GameObject::tryUpdateSection()
 		int sectionSize = GameLayer::instance->sectionObjects.size();
 		while (section >= sectionSize)
 		{
-			std::unordered_map<int, GameObject*> map;
+			tsl::ordered_map<int, GameObject*> map;
 			GameLayer::instance->sectionObjects.push_back(map);
 			sectionSize++;
 		}

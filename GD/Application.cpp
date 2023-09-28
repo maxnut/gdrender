@@ -4,6 +4,10 @@
 #include "imgui-SFML.h"
 #include "imgui.h"
 
+#include <chrono>
+#include <ctime>
+#include <thread>
+
 #define MULTITHREADING 0
 
 Application* Application::instance;
@@ -18,7 +22,7 @@ void Application::start()
 
     window = new sf::RenderWindow(sf::VideoMode(1280, 720), "GD", sf::Style::Default, settings);
     renderTexture.create(1920, 1080);
-    window->setFramerateLimit(50000);
+    framerate = 240;
     window->setVerticalSyncEnabled(false);
     window->setActive(!MULTITHREADING);
 
@@ -41,14 +45,22 @@ void Application::start()
     thread.launch();
 #endif
 
+    auto next_frame = std::chrono::steady_clock::now();
+
     while (window->isOpen())
     {
+        if(framerate > 0)
+            std::this_thread::sleep_until(next_frame);
+
         update();
 
 #if MULTITHREADING == 0
         draw();
 #endif
 
+        //custom framerate lock because sfml one fucking sucks
+        if (framerate > 0)
+            next_frame += std::chrono::microseconds(1000000 / framerate);
     }
 
     onQuit();

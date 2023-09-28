@@ -136,6 +136,7 @@ void GameLayer::update()
     processColorActions();
 
     updateLevelObjects();
+    
     updateVisibility();
 
 }
@@ -164,7 +165,7 @@ void GameLayer::draw()
     tex->draw(*gameSheet02);
     tex->draw(framerate);
 
-    //drawImGui();
+    drawImGui();
 }
 
 
@@ -428,17 +429,16 @@ void GameLayer::loadLevel(std::string levelId)
 
     if (objects.size() != 0)
     {
-        lastObjXPos = 570.0f;
 
-        for (std::shared_ptr<GameObject> object : objects)
-        {
-            if (lastObjXPos < object->getPosition().x)
-                lastObjXPos = object->getPosition().x;
-        }
+        std::sort(objects.begin(), objects.end(), [](const auto& x,
+            const auto& y)
+            {
+                return x->zOrder < y->zOrder;
+            });
 
         for (size_t i = 0; i < Common::sectionForPos(lastObjXPos); i++)
         {
-            std::unordered_map<int, GameObject*> map;
+            tsl::ordered_map<int, GameObject*> map;
             sectionObjects.push_back(map);
         }
 
@@ -449,24 +449,6 @@ void GameLayer::loadLevel(std::string levelId)
 
         for (auto& section : sectionObjects)
         {
-            std::vector<std::pair<int, GameObject*>> toSort;
-
-            for (auto s : section)
-                toSort.push_back(s);
-
-            std::sort(toSort.begin(), toSort.end(), [](const auto& x,
-                const auto& y)
-                {
-                    return x.second->zLayer < y.second->zLayer;
-                });
-
-            section.clear();
-
-            for (auto s : toSort)
-            {
-                section.insert(s);
-            }
-
             if (section.size() > maxSectionSize)
                 maxSectionSize = section.size();
         }
@@ -662,6 +644,9 @@ void GameLayer::setupObjects(std::string_view levelString)
         {
             objects.push_back(obj);
             obj->objectIndex = GameLayer::instance->objects.size() - 1;
+
+            if(obj->getPosition().x > lastObjXPos)
+                lastObjXPos = obj->getPosition().x;
         }
     }
 }
@@ -727,6 +712,7 @@ void GameLayer::updateVisibility()
     int prevSection = floorf((camPos - (winSize.x / 3)) / 100) + 1;
     int nextSection = ceilf((camPos) / 100) + 3;
 
+    
     if (this->prevSection - 1 >= 0 && sectionObjects.size() != 0 && this->prevSection - 1 < sectionObjects.size())
     {
         auto section = &sectionObjects[this->prevSection - 1];
@@ -739,7 +725,7 @@ void GameLayer::updateVisibility()
         }
     }
 
-    if (this->nextSection + 1 >= 0 && sectionObjects.size() != 0 && this->nextSection + 1 < sectionObjects.size())
+    /*if (this->nextSection + 1 >= 0 && sectionObjects.size() != 0 && this->nextSection + 1 < sectionObjects.size())
     {
         auto section = &sectionObjects[this->nextSection + 1];
         for (auto pair : *section)
@@ -749,7 +735,7 @@ void GameLayer::updateVisibility()
             for (std::shared_ptr<Sprite> spr : obj->childSprites)
                 spr->removeFromBatcher();
         }
-    }
+    }*/
 
     for (int i = prevSection; i < nextSection; i++)
     {
@@ -758,7 +744,7 @@ void GameLayer::updateVisibility()
             if (i < sectionObjects.size())
             {
                 auto section = &sectionObjects[i];
-                for (auto pair : *section)
+                for (auto&pair : *section)
                 {
                     GameObject* obj = pair.second;
 
@@ -772,9 +758,11 @@ void GameLayer::updateVisibility()
 
                     obj->updateOpacity();
 
-                    layerObject(obj);
+                    std::cout << obj->zOrder << std::endl;
+
                     for (std::shared_ptr<Sprite>& sprite : obj->childSprites)
                         layerObject(sprite.get());
+                    layerObject(obj);
                 }
             }
         }

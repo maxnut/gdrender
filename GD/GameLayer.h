@@ -14,6 +14,8 @@
 #include "Group.h"
 #include "AudioEngine.h"
 
+#include "tsl/ordered_map.h"
+
 #include <chrono>
 
 class GameLayer : public Layer
@@ -22,7 +24,7 @@ private:
 	sf::View camera;
 	std::chrono::time_point<std::chrono::high_resolution_clock> previous_frame, last_update;
 
-	float lastObjXPos = 0;
+	float lastObjXPos = 570.f;
 	float avg = 0;
 
 	float musicOffset = 0;
@@ -59,7 +61,7 @@ public:
 	std::optional<AudioEngine> audioEngine;
 
 	std::vector<std::shared_ptr<GameObject>> objects;
-	std::vector<std::unordered_map<int, GameObject*>> sectionObjects;
+	std::vector<tsl::ordered_map<int, GameObject*>> sectionObjects;
 	std::vector<std::shared_ptr<ColorAction>> colorActionsActive;
 	std::vector<std::shared_ptr<CopyColorAction>> copyColorActionsActive;
 	std::vector<std::shared_ptr<PulseAction>> pulseActionsActive;
