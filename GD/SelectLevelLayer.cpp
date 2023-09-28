@@ -54,6 +54,20 @@ void SelectLevelLayer::draw()
 		searchLevels(searchStrPersistent.data(), page);
 	}
 
+	ImGui::SameLine();
+
+	if (ImGui::Button("Test Audio")) {
+		if (!audioEngine) {
+			audioEngine = AudioEngine::create();
+		}
+		audioEngine->loadAudio("Resources\\BaseAfterBase.mp3");
+		audioEngine->play();
+	}
+
+	if (audioEngine && audioEngine->isPlaying) {
+		audioEngine->update();
+	}
+	
 	ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, { 10, 10 });
 	if (ImGui::BeginTable("table1", 7,
 		ImGuiTableFlags_RowBg | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_Resizable |

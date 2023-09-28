@@ -1,22 +1,17 @@
 #pragma once
 
-#include <fmod.hpp>
-#include <fmod_errors.h>
-
-#include <iostream>
-
+#include "raudio.h"
+#include <optional>
 class AudioEngine {
 private:
-    FMOD::System* system = nullptr;
-    FMOD::Sound* sound = nullptr;
-    FMOD::Channel* channel = nullptr;
+    Music music = { 0 };
+
 public:
-    bool isPlaying;
-public:
-    
+    bool isPlaying = false;
+
     ~AudioEngine();
 
-    static std::shared_ptr<AudioEngine> create();
+    static std::optional<AudioEngine> create();
 
     bool init();
     void update();

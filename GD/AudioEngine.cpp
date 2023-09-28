@@ -1,87 +1,70 @@
 #include "AudioEngine.h"
+#include "raudio.h"
 
 AudioEngine::~AudioEngine() {
-    if (system) {
-        system->close();
-        system->release();
+    if (isPlaying) {
+        PauseMusicStream(music);
+    }
+
+    if (IsMusicReady(music)) {
+        UnloadMusicStream(music);
     }
 }
 
-std::shared_ptr<AudioEngine> AudioEngine::create()
+std::optional<AudioEngine> AudioEngine::create()
 {
-    std::shared_ptr<AudioEngine> ptr(new AudioEngine);
-
-    if (ptr->init())
-        return ptr;
-
-    return nullptr;
+    AudioEngine ret;
+    return ret.init() ? std::make_optional<AudioEngine>(ret) : std::nullopt;
 }
 
 bool AudioEngine::init() {
-    FMOD_RESULT result = FMOD::System_Create(&system);
-    if (result != FMOD_OK) {
-        return false;
-    }
+    if (IsAudioDeviceReady()) return true;
 
-    result = system->init(32, FMOD_INIT_NORMAL, nullptr);
-    if (result != FMOD_OK) {
-        return false;
-    }
+    InitAudioDevice();
 
-    isPlaying = false;
-
-    return true;
+    return IsAudioDeviceReady();
 }
 
 void AudioEngine::update() {
-    if (system) {
-        system->update();
+    if (isPlaying) {
+        UpdateMusicStream(music);
     }
 }
 
 bool AudioEngine::loadAudio(const char* filePath) {
-    if (!system) {
-        return false;
+    if (IsMusicReady(music))
+    {
+        UnloadMusicStream(music);
     }
-
-    FMOD_RESULT result = system->createSound(filePath, FMOD_DEFAULT, nullptr, &sound);
-    if (result != FMOD_OK) {
-        return false;
-    }
-
-    return true;
+    music = LoadMusicStream(filePath);
+    return IsMusicReady(music);
 }
 
 void AudioEngine::play() {
-    if (sound && !channel) {
-        system->playSound(sound, nullptr, false, &channel);
+    if (!IsMusicStreamPlaying(music) && IsMusicReady(music)) {
+        PlayMusicStream(music);
         isPlaying = true;
     }
 }
 
 void AudioEngine::pause() {
-    if (channel) {
-        channel->setPaused(true);
+    if (IsMusicStreamPlaying(music)) {
+        PauseMusicStream(music);
         isPlaying = false;
     }
 }
 
 void AudioEngine::resume() {
-    if (channel) {
-        channel->setPaused(false);
+    if (!IsMusicStreamPlaying(music)) {
+        ResumeMusicStream(music);
         isPlaying = true;
     }
 }
 
 void AudioEngine::setPosition(float seconds) {
-    if (channel) {
-        unsigned int position = static_cast<unsigned int>(seconds * 1000);
-        channel->setPosition(position, FMOD_TIMEUNIT_MS);
-    }
+    SeekMusicStream(music, seconds);
 }
 
 void AudioEngine::setVolume(float volume) {
-    if (channel) {
-        channel->setVolume(volume);
-    }
+    SetMusicVolume(music, volume);
 }

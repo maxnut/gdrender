@@ -4,6 +4,7 @@
 #include "Level.h"
 
 #include <array>
+#include "AudioEngine.h"
 
 class SelectLevelLayer : public Layer
 {
@@ -12,6 +13,7 @@ private:
 
 	std::array<char, 50> searchStr;
 	std::array<char, 50> searchStrPersistent;
+	std::optional<AudioEngine> audioEngine;
 
 	int page = 1;
 public:

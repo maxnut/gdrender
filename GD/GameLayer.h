@@ -56,7 +56,7 @@ public:
 	std::shared_ptr<sf::Sprite> backgroundSprite;
 	std::shared_ptr<sf::Texture> backgroundTexture;
 
-	std::shared_ptr<AudioEngine> audioEngine;
+	std::optional<AudioEngine> audioEngine;
 
 	std::vector<std::shared_ptr<GameObject>> objects;
 	std::vector<std::unordered_map<int, GameObject*>> sectionObjects;

@@ -3,6 +3,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(SFML_BUILD_AUDIO OFF)
 
 project(gdrender)
 
@@ -46,6 +47,7 @@ add_executable(gdrender
     GD/SpawnAction.cpp
     GD/Sprite.cpp
     GD/Tween.cpp
+    GD/raudio.c
 )
 
 CPMAddPackage("gh:SFML/SFML#2.6.x")
@@ -55,23 +57,21 @@ target_include_directories(gdrender PRIVATE
     GD/include
     GD/include/imgui
     GD/include/imgui-SFML
-    GD/include/fmod
+    GD/include/raudio
+)
+
+target_compile_definitions(gdrender PRIVATE 
+    RAUDIO_STANDALONE
+    SUPPORT_FILEFORMAT_MP3
+    SUPPORT_MODULE_RAUDIO
 )
 
 target_link_libraries(gdrender
-    ${CMAKE_CURRENT_SOURCE_DIR}/GD/lib/fmod_vc.lib
     sfml-graphics
     cpr::cpr
     opengl32
     zlib
 )
 
-if(WIN32)
-    add_custom_command(
-        TARGET gdrender
-        COMMENT "Copy OpenAL DLL"
-        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:gdrender>
-        VERBATIM)
-endif()
 
 install(TARGETS gdrender)

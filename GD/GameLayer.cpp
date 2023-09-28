@@ -78,7 +78,9 @@ bool GameLayer::init(int levelID)
         ss << localAppDataPathStr << "\\GeometryDash\\";
         ss << songID;
         ss << ".mp3";
-        audioEngine->loadAudio(ss.str().c_str());
+        if (audioEngine && !audioEngine->loadAudio(ss.str().c_str())) {
+            audioEngine = std::nullopt;
+        }
     }
 
     ss.str("");
@@ -114,12 +116,15 @@ void GameLayer::update()
     if (app->keyPressedMap[sf::Keyboard::P])
         canStart = true;
 
-    if(canStart && !audioEngine->isPlaying)
+
+    if(canStart && audioEngine && !audioEngine->isPlaying)
     {
-        audioEngine->play();
         audioEngine->setPosition(musicOffset);
-        audioEngine->setVolume(0.15f);
+        audioEngine->play();
     }
+
+    if(audioEngine)
+        audioEngine->update();
 
     moveCamera();
 
@@ -133,7 +138,6 @@ void GameLayer::update()
     updateLevelObjects();
     updateVisibility();
 
-    audioEngine->update();
 }
 
 
