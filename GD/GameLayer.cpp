@@ -165,7 +165,7 @@ void GameLayer::draw()
     tex->draw(*gameSheet02);
     tex->draw(framerate);
 
-    drawImGui();
+    //drawImGui();
 }
 
 
@@ -757,8 +757,6 @@ void GameLayer::updateVisibility()
                         continue;
 
                     obj->updateOpacity();
-
-                    std::cout << obj->zOrder << std::endl;
 
                     for (std::shared_ptr<Sprite>& sprite : obj->childSprites)
                         layerObject(sprite.get());
