@@ -1,0 +1,64 @@
+BasedOnStyle: Microsoft
+
+# Allow double brackets such as std::vector<std::vector<int>>.
+Standard: Cpp11
+
+# Indent 4 spaces at a time.
+IndentWidth: 4
+
+# Keep lines under 120 columns long.
+
+SortIncludes: false
+BinPackParameters: false
+
+# Always break before braces
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
+  # Keeps extern "C" blocks unindented.
+  AfterExternBlock: false
+  BeforeLambdaBody: false
+
+# Lambda body indentation
+LambdaBodyIndentation: OuterScope
+
+# Indent case labels.
+IndentCaseLabels: false
+
+# Left-align pointers and references
+PointerAlignment: Left
+
+# Use 0 space negative offset for access modifiers
+AccessModifierOffset: -4
+
+AllowShortCaseLabelsOnASingleLine: false
+
+# Useful for spacing out functions in classes
+KeepEmptyLinesAtTheStartOfBlocks: true
+
+# Indent nested PP directives.
+IndentPPDirectives: AfterHash
+
+# Include blocks style
+IncludeBlocks: Preserve
+UseTab: Always
+BreakConstructorInitializers: BeforeComma
+
+AlignConsecutiveMacros: AcrossEmptyLines
+
+SpacesInLineCommentPrefix:
+  Maximum:         0

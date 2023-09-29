@@ -48,6 +48,8 @@ add_executable(gdrender
     GD/Sprite.cpp
     GD/Tween.cpp
     GD/raudio.c
+
+    .clang-format
 )
 
 CPMAddPackage("gh:SFML/SFML#2.6.x")

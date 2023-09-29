@@ -17,24 +17,27 @@ void GameObject::setupCustomObjects(nlohmann::json& objectJson, std::shared_ptr<
 
 		spr->parent = this;
 
-		sf::Vector2f flip = { sprite["flip_x"] ? -1.f : 1.f , sprite["flip_y"] ? -1.f : 1.f };
+		sf::Vector2f flip = {sprite["flip_x"] ? -1.f : 1.f, sprite["flip_y"] ? -1.f : 1.f};
 
-		spr->setScale({ sprite["scale_x"].get<float>() * flip.x, sprite["scale_y"].get<float>() * flip.y });
-		spr->setPosition({ sprite["x"].get<float>(), sprite["y"].get<float>() });
+		spr->setScale({sprite["scale_x"].get<float>() * flip.x, sprite["scale_y"].get<float>() * flip.y});
+		spr->setPosition({sprite["x"].get<float>(), sprite["y"].get<float>()});
 		spr->setRotation(sprite["rot"].get<float>());
 
 		float width = spr->texDef->textureRect.width / 4.f, height = spr->texDef->textureRect.height / 4.f;
 
-		sf::Vector2f _anchor = { width * sprite["anchor_x"].get<float>() * flip.x, height * sprite["anchor_y"].get<float>() * flip.y };
+		sf::Vector2f _anchor = {width * sprite["anchor_x"].get<float>() * flip.x,
+								height * sprite["anchor_y"].get<float>() * flip.y};
 
 		if (spr->texDef->rotated)
-			_anchor = { -_anchor.y, _anchor.x };
+			_anchor = {-_anchor.y, _anchor.x};
 
 		spr->anchor -= _anchor;
 
 		if (sprite.contains("color_type"))
 		{
-			if (sprite["color_type"] == "Base" || objectJson.contains("swap_base_detail") && sprite["color_type"] == "Detail" && objectJson["swap_base_detail"])
+			if (sprite["color_type"] == "Base" || objectJson.contains("swap_base_detail") &&
+													  sprite["color_type"] == "Detail" &&
+													  objectJson["swap_base_detail"])
 			{
 				spr->channel = GameLayer::instance->colorChannels[primaryColorChannel].get();
 				spr->hsvModifier = &primaryHSV;
@@ -108,13 +111,12 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 		return nullptr;
 
 	ptr->objectID = objID;
-	
 
 	ptr->zLayer = objectEntry["default_z_layer"];
 	if (objectEntry.contains("default_base_color_channel"))
 		ptr->primaryColorChannel = objectEntry["default_base_color_channel"];
 	if (objectEntry.contains("default_detail_color_channel"))
-	ptr->secondaryColorChannel = objectEntry["default_detail_color_channel"];
+		ptr->secondaryColorChannel = objectEntry["default_detail_color_channel"];
 
 	ptr->zOrder = objectEntry["default_z_order"];
 
@@ -133,10 +135,10 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 			ptr->setPosition(ptr->getPosition().x, Common::stof(properties[i + 1]));
 			break;
 		case 4:
-			ptr->setScale({ -1.f * Common::stof(properties[i + 1]) , 1.f });
+			ptr->setScale({-1.f * Common::stof(properties[i + 1]), 1.f});
 			break;
 		case 5:
-			ptr->setScale({ ptr->getScale().x , -1.f * Common::stof(properties[i + 1]) });
+			ptr->setScale({ptr->getScale().x, -1.f * Common::stof(properties[i + 1])});
 			break;
 		case 6:
 			ptr->setRotation(-Common::stof(properties[i + 1]));
@@ -186,12 +188,14 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 			effectPtr->easing = Common::stoi(properties[i + 1]);
 			break;
 		case 32:
-			ptr->setScale({ ptr->getScale().x * Common::stof(properties[i + 1]) , ptr->getScale().y * Common::stof(properties[i + 1]) });
+			ptr->setScale({ptr->getScale().x * Common::stof(properties[i + 1]),
+						   ptr->getScale().y * Common::stof(properties[i + 1])});
 			break;
 		case 35:
 			effectPtr->triggerColor.a = Common::stof(properties[i + 1]) * 255.f;
 			break;
-		case 43: {
+		case 43:
+		{
 			std::vector<std::string_view> hsv = Common::splitByDelimStringView(properties[i + 1], 'a');
 			ptr->primaryHSV.h = Common::stof(hsv[0]);
 			ptr->primaryHSV.s = Common::stof(hsv[1]);
@@ -199,8 +203,9 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 			ptr->primaryHSV.sChecked = Common::stoi(hsv[3]);
 			ptr->primaryHSV.vChecked = Common::stoi(hsv[4]);
 		}
-			   break;
-		case 44: {
+		break;
+		case 44:
+		{
 			std::vector<std::string_view> hsv = Common::splitByDelimStringView(properties[i + 1], 'a');
 			ptr->secondaryHSV.h = Common::stof(hsv[0]);
 			ptr->secondaryHSV.s = Common::stof(hsv[1]);
@@ -208,7 +213,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 			ptr->secondaryHSV.sChecked = Common::stoi(hsv[3]);
 			ptr->secondaryHSV.vChecked = Common::stoi(hsv[4]);
 		}
-			   break;
+		break;
 		case 45:
 			effectPtr->fadeIn = Common::stof(properties[i + 1]);
 			break;
@@ -221,7 +226,8 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 		case 48:
 			effectPtr->pulseMode = Common::stoi(properties[i + 1]);
 			break;
-		case 49: {
+		case 49:
+		{
 			std::vector<std::string_view> hsv = Common::splitByDelimStringView(properties[i + 1], 'a');
 			effectPtr->copyColorHSV.h = Common::stof(hsv[0]);
 			effectPtr->copyColorHSV.s = Common::stof(hsv[1]);
@@ -229,19 +235,19 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 			effectPtr->copyColorHSV.sChecked = Common::stoi(hsv[3]);
 			effectPtr->copyColorHSV.vChecked = Common::stoi(hsv[4]);
 		}
-			   break;
+		break;
 		case 50:
 			effectPtr->copyColorID = Common::stoi(properties[i + 1]);
 			break;
 		case 51:
-			if(ptr->isTrigger)
+			if (ptr->isTrigger)
 				effectPtr->targetGroupId = Common::stoi(properties[i + 1]);
 			break;
 		case 52:
 			effectPtr->pulseType = Common::stoi(properties[i + 1]);
 			break;
 		case 56:
-			if(ptr->isTrigger)
+			if (ptr->isTrigger)
 				effectPtr->activateGroup = Common::stoi(properties[i + 1]);
 			break;
 		case 57:
@@ -257,9 +263,9 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 				if (!GameLayer::instance->groups[group]->objects.contains(ptr->section))
 				{
 					std::unordered_map<int, GameObject*> map;
-					GameLayer::instance->groups[group]->objects.insert({ ptr->section, map });
+					GameLayer::instance->groups[group]->objects.insert({ptr->section, map});
 				}
-				GameLayer::instance->groups[group]->objects[ptr->section].insert({ ptr->uniqueID, ptr.get()});
+				GameLayer::instance->groups[group]->objects[ptr->section].insert({ptr->uniqueID, ptr.get()});
 			}
 			break;
 		}
@@ -302,9 +308,11 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 		}
 	}
 
-	if(objectEntry.contains("color_type"))
+	if (objectEntry.contains("color_type"))
 	{
-		if (objectEntry["color_type"] == "Base" || objectEntry.contains("swap_base_detail") && objectEntry["color_type"] == "Detail" && objectEntry["swap_base_detail"])
+		if (objectEntry["color_type"] == "Base" || objectEntry.contains("swap_base_detail") &&
+													   objectEntry["color_type"] == "Detail" &&
+													   objectEntry["swap_base_detail"])
 		{
 			ptr->channel = GameLayer::instance->colorChannels[ptr->primaryColorChannel].get();
 			ptr->hsvModifier = &ptr->primaryHSV;
@@ -326,7 +334,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 	ptr->parent = ptr.get();
 
 	ptr->addToChannelSection();
-	
+
 	ptr->setupCustomObjects(objectEntry, ptr);
 
 	ptr->startPosition = ptr->getPosition();
@@ -358,7 +366,7 @@ void GameObject::updatePosition()
 	if (groups.size() <= 0)
 		return;
 
-	sf::Vector2f move = { 0, 0 };
+	sf::Vector2f move = {0, 0};
 	float rotate = 0;
 	for (int i : groups)
 	{
@@ -376,7 +384,7 @@ void GameObject::updatePosition()
 		{
 			sf::Vector2f rotationPoint = group->rotateAround->getPosition();
 			float rotationAngle = group->rotateTotalMovement;
-			
+
 			sf::Transform transform;
 			transform.rotate(rotationAngle, rotationPoint);
 
@@ -395,8 +403,6 @@ void GameObject::updatePosition()
 	for (std::shared_ptr<Sprite> child : childSprites)
 		child->updateVerticesPosition();
 }
-
-
 
 void GameObject::tryUpdateSection()
 {
@@ -424,7 +430,7 @@ void GameObject::tryUpdateSection()
 			GameLayer::instance->sectionObjects.push_back(map);
 			sectionSize++;
 		}
-		GameLayer::instance->sectionObjects[section].insert({ uniqueID, this });
+		GameLayer::instance->sectionObjects[section].insert({uniqueID, this});
 		this->section = section;
 
 		for (int i : groups)
@@ -437,9 +443,9 @@ void GameObject::tryUpdateSection()
 			if (!group->objects.contains(section))
 			{
 				std::unordered_map<int, GameObject*> map;
-				group->objects.insert({ section, map });
+				group->objects.insert({section, map});
 			}
-			group->objects[section].insert({ uniqueID, this });
+			group->objects[section].insert({uniqueID, this});
 		}
 
 		addToChannelSection();
