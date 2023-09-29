@@ -22,7 +22,8 @@ class GameLayer : public Layer
 {
 private:
 	sf::View camera;
-	std::chrono::time_point<std::chrono::high_resolution_clock> previous_frame, last_update;
+	std::chrono::time_point<std::chrono::high_resolution_clock> previous_frame;
+	std::chrono::time_point<std::chrono::high_resolution_clock> last_update;
 
 	float lastObjXPos = 570.f;
 	float avg = 0;
@@ -34,26 +35,27 @@ private:
 
 	bool move = true;
 
-	int frame_count;
+	int frame_count = 0;
 	int levelID = 1;
 
 	int bgID = 1;
+
 public:
-	std::shared_ptr<Batcher> gameSheet01_t3
-		, gameSheet01_t3_blending
-		, gameSheet01_t2
-		, gameSheet01_t2_blending
-		, gameSheet01_t1
-		, gameSheet01_t1_blending
-		, gameSheet01_b4
-		, gameSheet01_b4_blending
-		, gameSheet01_b3
-		, gameSheet01_b3_blending
-		, gameSheet01_b2
-		, gameSheet01_b2_blending
-		, gameSheet01_b1
-		, gameSheet01_b1_blending
-		, gameSheet02;
+	std::shared_ptr<Batcher> gameSheet01_t3;
+	std::shared_ptr<Batcher> gameSheet01_t3_blending;
+	std::shared_ptr<Batcher> gameSheet01_t2;
+	std::shared_ptr<Batcher> gameSheet01_t2_blending;
+	std::shared_ptr<Batcher> gameSheet01_t1;
+	std::shared_ptr<Batcher> gameSheet01_t1_blending;
+	std::shared_ptr<Batcher> gameSheet01_b4;
+	std::shared_ptr<Batcher> gameSheet01_b4_blending;
+	std::shared_ptr<Batcher> gameSheet01_b3;
+	std::shared_ptr<Batcher> gameSheet01_b3_blending;
+	std::shared_ptr<Batcher> gameSheet01_b2;
+	std::shared_ptr<Batcher> gameSheet01_b2_blending;
+	std::shared_ptr<Batcher> gameSheet01_b1;
+	std::shared_ptr<Batcher> gameSheet01_b1_blending;
+	std::shared_ptr<Batcher> gameSheet02;
 
 	std::shared_ptr<sf::Sprite> backgroundSprite;
 	std::shared_ptr<sf::Texture> backgroundTexture;
@@ -81,11 +83,12 @@ public:
 
 	Sprite* selected = nullptr;
 
-	int prevSection = 0, nextSection = 0;
-	int songID;
+	int prevSection = 0;
+	int nextSection = 0;
+	int songID = 0;
 	int maxSectionSize = 0;
 
-	sf::Vector2f deltaMove = { 0, 0 };
+	sf::Vector2f deltaMove = {0, 0};
 
 	bool canStart = false;
 

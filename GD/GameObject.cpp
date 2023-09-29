@@ -265,7 +265,8 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 					std::unordered_map<int, GameObject*> map;
 					GameLayer::instance->groups[group]->objects.insert({ptr->section, map});
 				}
-				GameLayer::instance->groups[group]->objects[ptr->section].insert({ptr->uniqueID, ptr.get()});
+				GameLayer::instance->groups[group]->objects[ptr->section].insert(
+					{static_cast<int>(ptr->uniqueID), ptr.get()});
 			}
 			break;
 		}
@@ -414,7 +415,7 @@ void GameObject::tryUpdateSection()
 	if (this->section != section)
 	{
 		removeFromChannel();
-		for (auto spr : childSprites)
+		for (auto& spr : childSprites)
 		{
 			spr->removeFromChannel();
 		}
@@ -430,7 +431,7 @@ void GameObject::tryUpdateSection()
 			GameLayer::instance->sectionObjects.push_back(map);
 			sectionSize++;
 		}
-		GameLayer::instance->sectionObjects[section].insert({uniqueID, this});
+		GameLayer::instance->sectionObjects[section].insert({static_cast<int>(uniqueID), this});
 		this->section = section;
 
 		for (int i : groups)
@@ -445,7 +446,7 @@ void GameObject::tryUpdateSection()
 				std::unordered_map<int, GameObject*> map;
 				group->objects.insert({section, map});
 			}
-			group->objects[section].insert({uniqueID, this});
+			group->objects[section].insert({static_cast<int>(uniqueID), this});
 		}
 
 		addToChannelSection();

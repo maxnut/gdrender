@@ -8,13 +8,18 @@ class GameObject : public Sprite
 {
 private:
 	static nlohmann::json objJson;
+
 public:
 	bool isTrigger = false;
 	bool enabled = true;
 
-	int zLayer = -1, zOrder = 1, section = 0;
-	int primaryColorChannel = -1, secondaryColorChannel = -1;
-	uint32_t objectID = 0, objectIndex;
+	int zLayer = -1;
+	int zOrder = 1;
+	int section = 0;
+	int primaryColorChannel = -1;
+	int secondaryColorChannel = -1;
+	uint32_t objectID = 0;
+	uint32_t objectIndex = 0;
 
 	HSV primaryHSV, secondaryHSV;
 
@@ -26,8 +31,11 @@ public:
 
 	float rotateOffset = 0.f;
 	float startRotation = 0.f;
+
 public:
-	GameObject() : Sprite() {}
+	GameObject()
+		: Sprite()
+	{}
 
 	static std::shared_ptr<GameObject> createFromString(std::string_view str);
 
