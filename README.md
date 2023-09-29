@@ -12,15 +12,17 @@ __Levels will probably have some incorrect parts__
 
 # Credits
 
-[gdclone](https://github.com/opstic/gdclone) helped a ton with child sprites and a bunch of other stuff
+[opstic](https://github.com/opstic/gdclone) helped a ton with child sprites and a bunch of other stuff
 
 [axmol](https://github.com/axmolengine/axmol) actions and zlib functions
 
-# Building
-> **Warning**
-> Only tested on Visual Studio 2022
+[matcool](https://github.com/matcool) converted to cmake and helped with some level stuff
 
-Open the project's solution with visual studio and build, everything should be already configured correctly
+[iAndyHD3](https://github.com/iAndyHD3) ported the audio engine to raudio
+
+# Building
+
+Build the project with cmake
 
 # Screenshots
 
