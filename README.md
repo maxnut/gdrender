@@ -24,6 +24,8 @@ __Levels will probably have some incorrect parts__
 
 Build the project with cmake
 
+Drag the GD resources folder and the additional resources in the build folder
+
 # Screenshots
 
 ![ss1](/images/ss1.png)
