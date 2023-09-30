@@ -47,6 +47,8 @@ add_executable(gdrender
     GD/SpawnAction.cpp
     GD/Sprite.cpp
     GD/Tween.cpp
+    GD/PlatformUtils.cpp
+    GD/PlatformUtils.h
     GD/raudio.c
 
     .clang-format

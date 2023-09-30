@@ -10,9 +10,8 @@
 #include "imgui.h"
 
 #include "SelectLevelLayer.h"
-
-#include <Windows.h>
-#include <ShlObj.h>
+#include "PlatformUtils.h"
+#include <format>
 
 GameLayer* GameLayer::instance;
 
@@ -65,26 +64,14 @@ bool GameLayer::init(int levelID)
 
 	std::stringstream ss;
 
-	PWSTR localAppDataPath;
-	if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &localAppDataPath)))
+	if (auto gdfolder = PlatformUtils::getGDAppdata(); gdfolder && audioEngine)
 	{
-
-		std::wstring wideString(localAppDataPath);
-		std::string localAppDataPathStr(wideString.begin(), wideString.end());
-
-		CoTaskMemFree(localAppDataPath);
-
-		ss << localAppDataPathStr << "\\GeometryDash\\";
-		ss << songID;
-		ss << ".mp3";
-		if (audioEngine && !audioEngine->loadAudio(ss.str().c_str()))
+		if (!audioEngine->loadAudio(gdfolder.value() / std::format("{}.mp3", songID)))
 		{
 			audioEngine = std::nullopt;
 		}
 	}
 
-	ss.str("");
-	ss.clear();
 	ss << "Resources\\game_bg_" << std::setw(2) << std::setfill('0') << bgID << "_001-uhd.png";
 	std::string bgTex = ss.str();
 

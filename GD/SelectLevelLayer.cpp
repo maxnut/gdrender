@@ -1,4 +1,4 @@
-#include "SelectLevelLayer.h"
+﻿#include "SelectLevelLayer.h"
 #include "GameLayer.h"
 #include "imgui.h"
 #include "Application.h"
@@ -56,22 +56,29 @@ void SelectLevelLayer::draw()
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Test Audio")) {
-		if (!audioEngine) {
+	if (ImGui::Button("Test Audio"))
+	{
+		if (!audioEngine)
+		{
 			audioEngine = AudioEngine::create();
 		}
-		audioEngine->loadAudio("Resources\\BaseAfterBase.mp3");
+		if (!audioEngine->loadAudio("Resources\\BaseAfterBase.mp3"))
+		{
+			audioEngine = std::nullopt;
+		}
+
 		audioEngine->play();
 	}
 
-	if (audioEngine && audioEngine->isPlaying) {
+	if (audioEngine && audioEngine->isPlaying)
+	{
 		audioEngine->update();
 	}
-	
-	ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, { 10, 10 });
+
+	ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {10, 10});
 	if (ImGui::BeginTable("table1", 7,
-		ImGuiTableFlags_RowBg | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_Resizable |
-		ImGuiTableFlags_Borders | ImGuiTableFlags_NoBordersInBody))
+						  ImGuiTableFlags_RowBg | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_Resizable |
+							  ImGuiTableFlags_Borders | ImGuiTableFlags_NoBordersInBody))
 	{
 		ImGui::TableSetupColumn("Name");
 		ImGui::TableSetupColumn("Downloads");
@@ -113,13 +120,12 @@ void SelectLevelLayer::draw()
 
 				ImGui::Text(std::to_string(level->levelID).c_str());
 				ImGui::TableNextColumn();
-				
+
 				if (ImGui::Button(("Open##" + std::to_string(level->levelID)).c_str()))
 				{
 					std::shared_ptr<GameLayer> gameLayer = GameLayer::create(level->levelID);
 					Application::instance->pushLayer(gameLayer);
 				}
-
 			}
 		}
 
@@ -137,7 +143,8 @@ void SelectLevelLayer::searchLevels(std::string searchQuery, int page)
 	cpr::Session session;
 
 	auto url = cpr::Url("http://www.boomlings.com/database/getGJLevels21.php");
-	auto payload = cpr::Payload{ { "secret", "Wmfd2893gb7" }, { "str", searchQuery }, {"type", "0"}, {"page", std::to_string(page)} };
+	auto payload =
+		cpr::Payload{{"secret", "Wmfd2893gb7"}, {"str", searchQuery}, {"type", "0"}, {"page", std::to_string(page)}};
 
 	session.SetUrl(url);
 	session.SetPayload(payload);

@@ -2,23 +2,26 @@
 
 #include "raudio.h"
 #include <optional>
-class AudioEngine {
+#include <filesystem>
+
+class AudioEngine
+{
 private:
-    Music music = { 0 };
+	Music music = {0};
 
 public:
-    bool isPlaying = false;
+	bool isPlaying = false;
 
-    ~AudioEngine();
+	~AudioEngine();
 
-    static std::optional<AudioEngine> create();
+	static std::optional<AudioEngine> create();
 
-    bool init();
-    void update();
-    bool loadAudio(const char* filePath);
-    void play();
-    void pause();
-    void resume();
-    void setVolume(float volume);
-    void setPosition(float seconds);
+	bool init();
+	void update();
+	bool loadAudio(const std::filesystem::path& filePath);
+	void play();
+	void pause();
+	void resume();
+	void setVolume(float volume);
+	void setPosition(float seconds);
 };
