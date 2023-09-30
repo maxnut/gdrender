@@ -675,14 +675,16 @@ void GameLayer::updateVisibility()
 	int prevSection = floorf((camPos - (winSize.x / 3)) / 100) + 1;
 	int nextSection = ceilf((camPos) / 100) + 3;
 
-	if (this->prevSection - 1 >= 0 && sectionObjects.size() != 0 && this->prevSection - 1 < sectionObjects.size())
+	int prevPrevSection = this->prevSection - 1;
+	bool sectionInRange = prevPrevSection >= 0 && prevPrevSection < sectionObjects.size();
+
+	if (sectionInRange && !sectionObjects.empty())
 	{
-		auto& section = sectionObjects[this->prevSection - 1];
-		for (auto& pair : section)
+		for (auto& pair : sectionObjects[prevPrevSection])
 		{
 			GameObject* obj = pair.second;
 			obj->removeFromBatcher();
-			for (std::shared_ptr<Sprite> spr : obj->childSprites)
+			for (auto& spr : obj->childSprites)
 				spr->removeFromBatcher();
 		}
 	}

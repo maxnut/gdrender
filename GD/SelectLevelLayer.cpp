@@ -157,7 +157,7 @@ void SelectLevelLayer::searchLevels(std::string searchQuery, int page)
 
 	auto levelSplit = Common::splitByDelim(Common::splitByDelim(r.text, '#')[0], '|');
 
-	for (auto str : levelSplit)
+	for (auto& str : levelSplit)
 	{
 		GameLevel level = GameLevel::fromString(str);
 		levels.push_back(level);
