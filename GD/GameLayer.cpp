@@ -632,7 +632,7 @@ void GameLayer::updateTriggers()
 		if (i < sectionObjects.size() && i >= 0)
 		{
 			auto& section = sectionObjects[i];
-			for (auto&pair : section)
+			for (auto& pair : section)
 			{
 				GameObject* obj = pair.second;
 				if (obj->getPosition().x > camera.getCenter().x / Application::zoomModifier)
@@ -730,7 +730,7 @@ void GameLayer::updateVisibility()
 			if (i < sectionObjects.size())
 			{
 				auto section = &sectionObjects[i];
-				for (auto&pair : *section)
+				for (auto& pair : *section)
 				{
 					GameObject* obj = pair.second;
 					if (!obj || obj->currentBatcher != nullptr || !obj->enabled)
@@ -781,9 +781,11 @@ void GameLayer::layerObject(Sprite* sprite)
 	bool blending = sprite->channel && sprite->channel->blending;
 
 	if (sprite->channel && sprite->channel->id == 1010)
-		blending = colorChannels[sprite->parent->secondaryColorChannel == -1 ? sprite->parent->primaryColorChannel
-																			 : sprite->parent->secondaryColorChannel]
-					   ->blending;
+	{
+		bool hasSecondChannel = sprite->parent->secondaryColorChannel != -1;
+		int channel = hasSecondChannel ? sprite->parent->secondaryColorChannel : sprite->parent->primaryColorChannel;
+		blending = colorChannels[channel]->blending;
+	}
 
 	if (sprite->texDef->sheet == "Resources\\GJ_GameSheet-uhd.png")
 	{
@@ -835,10 +837,7 @@ void GameLayer::layerObject(Sprite* sprite)
 
 void GameLayer::drawForObject(GameObject* object, int index)
 {
-	std::shared_ptr<Sprite> sel = nullptr;
-	std::stringstream nodeName;
-	nodeName << "GameObject (" << object->objectID << ") " << index;
-	if (ImGui::TreeNode(nodeName.str().c_str()))
+	if (ImGui::TreeNode(std::format("GameObject ({})", index).c_str()))
 	{
 
 		if (ImGui::IsItemClicked())
@@ -860,9 +859,7 @@ void GameLayer::drawForObject(GameObject* object, int index)
 
 void GameLayer::drawForSprite(Sprite* sprite, int index)
 {
-	std::stringstream nodeName;
-	nodeName << "Sprite " << index;
-	if (ImGui::TreeNode(nodeName.str().c_str()))
+	if (ImGui::TreeNode(std::format("Sprite {}", index).c_str()))
 	{
 		ImGui::TreePop();
 	}
@@ -873,30 +870,21 @@ void GameLayer::drawForSprite(Sprite* sprite, int index)
 
 void GameLayer::drawInspector()
 {
-	std::stringstream text;
-	text << "Position##" << selected->uniqueID;
 	float position[2] = {selected->getPosition().x, selected->getPosition().y};
-	if (ImGui::InputFloat2(text.str().c_str(), position))
+	if (ImGui::InputFloat2(std::format("Position##{}", selected->uniqueID).c_str(), position))
 	{
 		selected->setPosition({position[0], position[1]});
 		selected->updateVerticesPosition();
 	}
 
-	text.clear();
-	text.str("");
-
-	text << "Origin##" << selected->uniqueID;
-
 	float origin[2] = {selected->getOrigin().x, selected->getOrigin().y};
-	if (ImGui::InputFloat2(text.str().c_str(), origin))
+	if (ImGui::InputFloat2(std::format("Origin##{}", selected->uniqueID).c_str(), origin))
 	{
 		selected->setOrigin({origin[0], origin[1]});
 		selected->updateVerticesPosition();
 	}
 
-	text.clear();
-	text.str("");
-
+	std::stringstream text;
 	text << "Anchor##" << selected->uniqueID;
 
 	float anchor[2] = {selected->anchor.x, selected->anchor.y};

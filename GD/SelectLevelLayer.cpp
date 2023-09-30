@@ -70,6 +70,24 @@ void SelectLevelLayer::draw()
 		audioEngine->play();
 	}
 
+	ImGui::SameLine();
+
+	static bool fullScreen = false;
+	if (ImGui::Button(fullScreen ? "Windowed" : "Fullscreen"))
+	{
+		if (auto app = Application::instance; app)
+		{
+			fullScreen = !fullScreen;
+			sf::ContextSettings settings;
+			settings.antialiasingLevel = 4;
+
+			if (fullScreen)
+				app->window->create(sf::VideoMode(1920, 1080), "GD", sf::Style::Fullscreen, settings);
+			else
+				app->window->create(sf::VideoMode(1280, 720), "GD", sf::Style::Default, settings);
+		}
+	}
+
 	if (audioEngine && audioEngine->isPlaying)
 	{
 		audioEngine->update();
