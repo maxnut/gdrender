@@ -15,10 +15,11 @@ public:
 	sf::RenderWindow* window = nullptr;
 	sf::RenderTexture renderTexture;
 	float deltaTime = 0;
-
 	static const float zoomModifier;
 
 	int framerate = 240.f;
+
+	bool lockDelta = false;
 
 	static Application* instance;
 public:

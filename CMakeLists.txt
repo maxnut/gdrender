@@ -49,6 +49,8 @@ add_executable(gdrender
     GD/Tween.cpp
     GD/PlatformUtils.cpp
     GD/PlatformUtils.h
+    GD/Replay.cpp
+    GD/ReplayPlayer.cpp
     GD/raudio.c
 
     .clang-format

@@ -13,8 +13,10 @@
 #include "SpawnAction.h"
 #include "Group.h"
 #include "AudioEngine.h"
+#include "ReplayPlayer.h"
 
-#include "tsl/ordered_map.h"
+#include <unordered_set>
+#include <unordered_map>
 
 #include <chrono>
 
@@ -57,13 +59,16 @@ public:
 	std::shared_ptr<Batcher> gameSheet01_b1_blending;
 	std::shared_ptr<Batcher> gameSheet02;
 
+	std::array<std::shared_ptr<Batcher>, 14> batchers;
+
 	std::shared_ptr<sf::Sprite> backgroundSprite;
 	std::shared_ptr<sf::Texture> backgroundTexture;
 
 	std::optional<AudioEngine> audioEngine;
+	ReplayPlayer replayPlayer;
 
 	std::vector<std::shared_ptr<GameObject>> objects;
-	std::vector<tsl::ordered_map<int, GameObject*>> sectionObjects;
+	std::vector<std::unordered_map<int, GameObject*>> sectionObjects;
 	std::vector<std::shared_ptr<ColorAction>> colorActionsActive;
 	std::vector<std::shared_ptr<CopyColorAction>> copyColorActionsActive;
 	std::vector<std::shared_ptr<PulseAction>> pulseActionsActive;
@@ -72,11 +77,15 @@ public:
 	std::vector<std::shared_ptr<SpawnAction>> spawnActionsActive;
 	std::vector<std::shared_ptr<SpawnAction>> spawnActionsPending;
 	std::vector<std::shared_ptr<ActionInterval>> rotateActionsActive;
-	std::vector<int> dirtyChannels;
-	std::vector<int> dirtyGroups;
+	std::unordered_set<int> dirtyChannels;
+	std::unordered_set<int> dirtyGroups;
 
-	std::shared_ptr<ColorChannel> colorChannels[1013];
-	std::shared_ptr<Group> groups[1013];
+	std::unordered_set<int> dirtySections;
+
+	std::array<std::shared_ptr<ColorChannel>, 1013> colorChannels;
+	std::array<std::shared_ptr<Group>, 1013> groups;
+
+	std::shared_ptr<Sprite> playerSpriteTemp = nullptr;
 
 	sf::Text framerate;
 	sf::Font font;

@@ -21,29 +21,21 @@ void Batcher::addSprite(Sprite* sp)
     if (sp->currentBatcher != nullptr)
         return;
 
-    sprites.push_back(sp);
+    sprites.insert({sp->uniqueID, sp});
 
-    vertices.push_back(sp->vertices[0]);
-    vertices.push_back(sp->vertices[1]);
-    vertices.push_back(sp->vertices[2]);
-    vertices.push_back(sp->vertices[3]);
+    dirty = true;
 
     sp->currentBatcher = this;
-
-    sp->atlasIndex = sprites.size() - 1;
 }
 
 void Batcher::removeSprite(Sprite* sp)
 {
-    int vertIndex = sp->atlasIndex * 4;
+    if(dirty)
+        return;
 
-    for (int i = sp->atlasIndex + 1; i < sprites.size(); i++) {
-        sprites[i]->atlasIndex--;
-    }
+    sp->setOpacity(0);
 
-    vertices.erase(vertices.begin() + vertIndex, vertices.begin() + vertIndex + 4);
-
-    sprites.erase(sprites.begin() + sp->atlasIndex);
+    sprites.unordered_erase(sp->uniqueID);
 
     sp->currentBatcher = nullptr;
 }
@@ -80,4 +72,27 @@ bool Batcher::init(std::string texture, sf::BlendMode blendMode)
     this->vertices.reserve(reserve * 4);
 
     return true;
+}
+
+void Batcher::generateVertices()
+{
+    vertices.clear();
+
+    auto data = sprites.values_container();
+
+    std::sort(data.begin(), data.end(), [](const auto& x, const auto& y) { return x.second->parent->zOrder < y.second->parent->zOrder; });
+
+    size_t i = 0;
+    for(auto pair : data)
+    {
+        Sprite* sprite = pair.second;
+        sprite->atlasIndex = i;
+        vertices.push_back(sprite->vertices[0]);
+        vertices.push_back(sprite->vertices[1]);
+        vertices.push_back(sprite->vertices[2]);
+        vertices.push_back(sprite->vertices[3]);
+        i++;
+    }
+
+    dirty = false;
 }

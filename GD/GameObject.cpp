@@ -420,18 +420,22 @@ void GameObject::tryUpdateSection()
 			spr->removeFromChannel();
 		}
 
-		auto thisSectionMap = &GameLayer::instance->sectionObjects[this->section];
+		auto&thisSectionMap = GameLayer::instance->sectionObjects[this->section];
 
-		thisSectionMap->erase(uniqueID);
+		thisSectionMap.erase(this->uniqueID);
 
 		int sectionSize = GameLayer::instance->sectionObjects.size();
 		while (section >= sectionSize)
 		{
-			tsl::ordered_map<int, GameObject*> map;
+			std::unordered_map<int, GameObject*> map;
 			GameLayer::instance->sectionObjects.push_back(map);
 			sectionSize++;
 		}
-		GameLayer::instance->sectionObjects[section].insert({static_cast<int>(uniqueID), this});
+		GameLayer::instance->sectionObjects[section].insert({this->uniqueID, this});
+
+		/* if (GameLayer::instance->dirtySections.find(section) == GameLayer::instance->dirtySections.end())
+    		GameLayer::instance->dirtySections.insert(section); */
+
 		this->section = section;
 
 		for (int i : groups)
@@ -449,8 +453,12 @@ void GameObject::tryUpdateSection()
 			group->objects[section].insert({static_cast<int>(uniqueID), this});
 		}
 
+		removeFromBatcher();
 		addToChannelSection();
 		for (std::shared_ptr<Sprite> spr : childSprites)
+		{
+			spr->removeFromBatcher();
 			spr->addToChannelSection();
+		}
 	}
 }

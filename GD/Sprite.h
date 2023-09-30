@@ -44,7 +44,7 @@ public:
     static std::shared_ptr<Sprite> create(std::string texture);
     bool init(std::string texture);
 
-    void updateVerticesPosition();
+    void updateVerticesPosition(bool send = true);
     void sendVertices();
     void setColor(sf::Color color);
     void setColorWithoutSend(sf::Color color);

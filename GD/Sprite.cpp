@@ -4,7 +4,7 @@
 #include "Batcher.h"
 #include "GameLayer.h"
 
-void Sprite::updateVerticesPosition()
+void Sprite::updateVerticesPosition(bool send)
 {
 	if (currentBatcher == nullptr)
 	{
@@ -22,7 +22,8 @@ void Sprite::updateVerticesPosition()
 	for (int i = 0; i < 4; ++i)
 	{
 		updateVertexPosition(i, combinedTransform);
-		sendVertex(i);
+		if(send)
+			sendVertex(i);
 	}
 }
 

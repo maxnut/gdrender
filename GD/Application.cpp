@@ -20,20 +20,20 @@ void Application::start()
     sf::ContextSettings settings;
     settings.antialiasingLevel = 4;
 
-    window = new sf::RenderWindow(sf::VideoMode(1280, 720), "GD", sf::Style::Default, settings);
+    window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "GD", sf::Style::Fullscreen, settings);
     renderTexture.create(1920, 1080);
-    framerate = 240;
+    framerate = 0;
     window->setVerticalSyncEnabled(false);
     window->setActive(!MULTITHREADING);
 
     ImGui::SFML::Init(*window);
 
     ImGui::GetIO().Fonts->Clear();
-    ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arial.ttf", 18);
+    ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arial.ttf", 16);
     ImGui::SFML::UpdateFontTexture();
 
     ImGuiStyle& style = ImGui::GetStyle();
-    style.ScaleAllSizes(3.f);
+    style.ScaleAllSizes(2.f);
     style.WindowBorderSize = 0.0f;
     style.WindowPadding = ImVec2(50.0f, 50.0f);
 
@@ -79,7 +79,8 @@ void Application::update()
     }
 
     sf::Time dt = deltaClock.restart();
-    deltaTime = dt.asSeconds();
+
+    deltaTime = lockDelta ? 1.f/(float)framerate : dt.asSeconds();
 
     sf::Event event;
     while (window->pollEvent(event))

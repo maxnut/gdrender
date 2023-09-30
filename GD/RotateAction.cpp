@@ -87,7 +87,7 @@ void RotateAction::update(float time)
     if (!lockRotation)
         targetGroup->rotateTotal -= deltaRotation;
 
-    std::vector<int> *dirty = &GameLayer::instance->dirtyGroups;
-    if (std::find(dirty->begin(), dirty->end(), groupID) == dirty->end())
-        dirty->push_back(groupID);
+    auto&dirty = GameLayer::instance->dirtyGroups;
+	if (dirty.find(groupID) == dirty.end())
+    		dirty.insert(groupID);
 }

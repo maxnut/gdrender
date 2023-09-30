@@ -2,16 +2,18 @@
 #include "Application.h"
 
 #include "Common.h"
-#include "Level.h"
 #include "EffectGameObject.h"
+#include "Level.h"
 
-#include <cpr/cpr.h>
-#include <SFML/Audio.hpp>
 #include "imgui.h"
+#include <SFML/Audio.hpp>
+#include <cpr/cpr.h>
 
 #include "SelectLevelLayer.h"
 #include "PlatformUtils.h"
 #include <format>
+
+#include "ReplayPlayer.h"
 
 GameLayer* GameLayer::instance;
 
@@ -56,6 +58,11 @@ bool GameLayer::init(int levelID)
 	gameSheet01_b1 = Batcher::create("Resources\\GJ_GameSheet-uhd.png");
 	gameSheet01_b1_blending = Batcher::create("Resources\\GJ_GameSheet-uhd.png", sf::BlendAdd);
 
+	batchers = {gameSheet01_b1, gameSheet01_b1_blending, gameSheet01_b2, gameSheet01_b2_blending,
+				gameSheet01_b3, gameSheet01_b3_blending, gameSheet01_b4, gameSheet01_b4_blending,
+				gameSheet01_t3, gameSheet01_t3_blending, gameSheet01_t2, gameSheet01_t2_blending,
+				gameSheet01_t1, gameSheet01_t1_blending};
+
 	gameSheet02 = Batcher::create("Resources\\GJ_GameSheet02-uhd.png");
 	if (!gameSheet02)
 		return false;
@@ -85,6 +92,8 @@ bool GameLayer::init(int levelID)
 								backgroundSprite->getTextureRect().height / 2.f);
 
 	updateLevelObjects();
+
+	replayPlayer.load("Macros\\" + std::to_string(levelID) + ".macro");
 
 	return true;
 }
@@ -123,6 +132,9 @@ void GameLayer::update()
 	updateLevelObjects();
 
 	updateVisibility();
+
+	if (canStart)
+		replayPlayer.update();
 }
 
 void GameLayer::draw()
@@ -396,12 +408,9 @@ void GameLayer::loadLevel(std::string levelId)
 
 	if (objects.size() != 0)
 	{
-
-		std::sort(objects.begin(), objects.end(), [](const auto& x, const auto& y) { return x->zOrder < y->zOrder; });
-
 		for (size_t i = 0; i < Common::sectionForPos(lastObjXPos); i++)
 		{
-			tsl::ordered_map<int, GameObject*> map;
+			std::unordered_map<int, GameObject*> map;
 			sectionObjects.push_back(map);
 		}
 
@@ -418,9 +427,7 @@ void GameLayer::loadLevel(std::string levelId)
 	}
 
 	for (std::shared_ptr<ColorChannel>& channel : colorChannels)
-	{
-		dirtyChannels.push_back(channel->id);
-	}
+		dirtyChannels.insert(channel->id);
 }
 
 void GameLayer::setupLevel(std::string_view levelString)
@@ -625,7 +632,7 @@ void GameLayer::updateTriggers()
 		if (i < sectionObjects.size() && i >= 0)
 		{
 			auto& section = sectionObjects[i];
-			for (auto& pair : section)
+			for (auto&pair : section)
 			{
 				GameObject* obj = pair.second;
 				if (obj->getPosition().x > camera.getCenter().x / Application::zoomModifier)
@@ -669,6 +676,21 @@ void GameLayer::updateTriggers()
 
 void GameLayer::updateVisibility()
 {
+	/* for(int i : dirtySections)
+	{
+		auto& section = sectionObjects[i];
+		for (GameObject* obj : section)
+		{
+			obj->removeFromBatcher();
+			for (std::shared_ptr<Sprite> spr : obj->childSprites)
+				spr->removeFromBatcher();
+		}
+		std::sort(sectionObjects[i].begin(), sectionObjects[i].end(), [](const auto& x, const auto& y) { return
+	x->zOrder < y->zOrder; });
+	}
+
+	dirtySections.clear(); */
+
 	auto& winSize = camera.getSize();
 	auto camPos = camera.getCenter().x / Application::zoomModifier;
 
@@ -708,10 +730,9 @@ void GameLayer::updateVisibility()
 			if (i < sectionObjects.size())
 			{
 				auto section = &sectionObjects[i];
-				for (auto& pair : *section)
+				for (auto&pair : *section)
 				{
 					GameObject* obj = pair.second;
-
 					if (!obj || obj->currentBatcher != nullptr || !obj->enabled)
 						continue;
 
@@ -730,9 +751,26 @@ void GameLayer::updateVisibility()
 		}
 	}
 
+	for (std::shared_ptr<Batcher> batcher : batchers)
+	{
+		if (batcher->dirty)
+			batcher->generateVertices();
+	}
+
 	this->prevSection = prevSection;
 	this->nextSection = nextSection;
 }
+
+struct comp
+{
+	template <typename T>
+
+	//Comparator function
+	bool operator()(const T& l, const T& r) const
+	{
+		return l.first < r.first;
+	}
+};
 
 void GameLayer::layerObject(Sprite* sprite)
 {
@@ -792,7 +830,7 @@ void GameLayer::layerObject(Sprite* sprite)
 	sprite->setColorWithoutSend({col.r, col.g, col.b});
 	sprite->setOpacityWithoutSend(col.a);
 
-	sprite->updateVerticesPosition();
+	sprite->updateVerticesPosition(false);
 }
 
 void GameLayer::drawForObject(GameObject* object, int index)
@@ -836,7 +874,7 @@ void GameLayer::drawForSprite(Sprite* sprite, int index)
 void GameLayer::drawInspector()
 {
 	std::stringstream text;
-	text << "Position##" << (int)selected;
+	text << "Position##" << selected->uniqueID;
 	float position[2] = {selected->getPosition().x, selected->getPosition().y};
 	if (ImGui::InputFloat2(text.str().c_str(), position))
 	{
@@ -847,7 +885,7 @@ void GameLayer::drawInspector()
 	text.clear();
 	text.str("");
 
-	text << "Origin##" << (int)selected;
+	text << "Origin##" << selected->uniqueID;
 
 	float origin[2] = {selected->getOrigin().x, selected->getOrigin().y};
 	if (ImGui::InputFloat2(text.str().c_str(), origin))
@@ -859,7 +897,7 @@ void GameLayer::drawInspector()
 	text.clear();
 	text.str("");
 
-	text << "Anchor##" << (int)selected;
+	text << "Anchor##" << selected->uniqueID;
 
 	float anchor[2] = {selected->anchor.x, selected->anchor.y};
 	if (ImGui::InputFloat2(text.str().c_str(), anchor))
@@ -871,7 +909,7 @@ void GameLayer::drawInspector()
 	text.clear();
 	text.str("");
 
-	text << "Half Size##" << (int)selected;
+	text << "Half Size##" << selected->uniqueID;
 
 	float half[2] = {selected->half.x, selected->half.y};
 	if (ImGui::InputFloat2(text.str().c_str(), half))
@@ -883,7 +921,7 @@ void GameLayer::drawInspector()
 	text.clear();
 	text.str("");
 
-	text << "Scale##" << (int)selected;
+	text << "Scale##" << selected->uniqueID;
 
 	float scale[2] = {selected->getScale().x, selected->getScale().y};
 	if (ImGui::InputFloat2(text.str().c_str(), scale))
@@ -895,7 +933,7 @@ void GameLayer::drawInspector()
 	text.clear();
 	text.str("");
 
-	text << "Rotation##" << (int)selected;
+	text << "Rotation##" << selected->uniqueID;
 
 	float rotation = selected->getRotation();
 	if (ImGui::InputFloat(text.str().c_str(), &rotation))
@@ -914,7 +952,7 @@ void GameLayer::drawInspector()
 	text.str("");
 
 	text << "Texture Size: " << selected->texDef->textureRect.width << " " << selected->texDef->textureRect.height
-		 << "##" << (int)selected;
+		 << "##" << selected->uniqueID;
 	ImGui::Text(text.str().c_str());
 
 	text.clear();
