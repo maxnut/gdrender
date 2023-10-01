@@ -83,7 +83,7 @@ void Batcher::generateVertices()
     std::sort(data.begin(), data.end(), [](const auto& x, const auto& y) { return x.second->parent->zOrder < y.second->parent->zOrder; });
 
     size_t i = 0;
-    for(auto pair : data)
+    for(auto&pair : data)
     {
         Sprite* sprite = pair.second;
         sprite->atlasIndex = i;

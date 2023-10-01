@@ -30,7 +30,7 @@ void OpacityAction::update(float time)
 
 	for (int i = GameLayer::instance->prevSection; i < GameLayer::instance->nextSection + 1; i++)
 	{
-		for (auto pair : groupPtr->objectsInSections[i])
+		for (auto&pair : groupPtr->objectsInSections[i])
 		{
 			GameObject* obj = pair.second;
 			obj->updateOpacity();

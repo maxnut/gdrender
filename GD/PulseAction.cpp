@@ -98,7 +98,7 @@ void PulseAction::update(float time)
 
 			for (int i = GameLayer::instance->prevSection; i < GameLayer::instance->nextSection + 1; i++)
 			{
-				for (auto pair : group->objectsInSections[i])
+				for (auto&pair : group->objectsInSections[i])
 				{
 					GameObject* obj = pair.second;
 					applyToSpriteIn(obj, fadetime);
@@ -115,7 +115,7 @@ void PulseAction::update(float time)
 			std::shared_ptr<Group> group = GameLayer::instance->groups[target];
 			for (int i = GameLayer::instance->prevSection; i < GameLayer::instance->nextSection + 1; i++)
 			{
-				for (auto pair : group->objectsInSections[i])
+				for (auto&pair : group->objectsInSections[i])
 				{
 					GameObject* obj = pair.second;
 					applyToSpriteOut(obj, fadetime);
@@ -129,7 +129,7 @@ void PulseAction::update(float time)
 			std::shared_ptr<Group> group = GameLayer::instance->groups[target];
 			for (int i = GameLayer::instance->prevSection; i < GameLayer::instance->nextSection + 1; i++)
 			{
-				for (auto pair : group->objectsInSections[i])
+				for (auto&pair : group->objectsInSections[i])
 				{
 					GameObject* obj = pair.second;
 					applyToSpriteIn(obj, fadein + hold);
