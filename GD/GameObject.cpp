@@ -422,11 +422,10 @@ void GameObject::tryUpdateSection()
 			group->objectsInSections[section].insert({static_cast<int>(uniqueID), this});
 		}
 
-		removeFromBatcher();
+		pendRemove = true;
 		addToChannelSection();
 		for (std::shared_ptr<Sprite> spr : childSprites)
 		{
-			spr->removeFromBatcher();
 			spr->addToChannelSection();
 		}
 	}

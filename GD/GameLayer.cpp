@@ -713,14 +713,23 @@ void GameLayer::updateVisibility()
 				for (auto& pair : *section)
 				{
 					GameObject* obj = pair.second;
-					if (!obj || obj->currentBatcher != nullptr || !obj->enabled)
+					if (!obj || (obj->currentBatcher != nullptr && !obj->pendRemove) || !obj->enabled)
 						continue;
 
 					if (obj->isTrigger)
 						continue;
 
+					obj->pendRemove = false;
+
 					for (std::shared_ptr<Sprite>& sprite : obj->childSprites)
+					{
+						if(obj->pendRemove)
+							sprite->removeFromBatcher();
 						layerObject(sprite.get());
+					}
+
+					if(obj->pendRemove)
+						obj->removeFromBatcher();
 					layerObject(obj);
 
 					obj->updatePosition(false);

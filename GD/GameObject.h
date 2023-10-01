@@ -12,6 +12,7 @@ private:
 public:
 	bool isTrigger = false;
 	bool enabled = true;
+	bool pendRemove = false;
 
 	int zLayer = -1;
 	int zOrder = 1;
