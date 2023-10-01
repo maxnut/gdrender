@@ -20,17 +20,9 @@ bool SpawnAction::init(float duration, std::shared_ptr<Group> group)
 
 void SpawnAction::spawn()
 {
-	for (auto pair : group->objects)
+	for (EffectGameObject* trigger : group->spawnTriggered)
 	{
-		for (auto pair2 : pair.second)
-		{
-			GameObject* obj = pair2.second;
-			if (obj->isTrigger)
-			{
-				auto trigger = dynamic_cast<EffectGameObject*>(obj);
-				if (trigger->spawnTriggered)
-					trigger->triggerActivated();
-			}
-		}
+		if (trigger->spawnTriggered)
+			trigger->triggerActivated();
 	}
 }

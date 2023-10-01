@@ -56,6 +56,11 @@ void Sprite::updateVertexPosition(int index, sf::Transform& tr)
 void Sprite::sendVertex(int index)
 {
 	size_t atIndex = atlasIndex * 4;
+
+	//TODO: temporary solution, find out what's causing this
+	if(atIndex > currentBatcher->vertices.size())
+		return;
+
 	currentBatcher->vertices[atIndex + index] = vertices[index];
 }
 

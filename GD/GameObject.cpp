@@ -260,12 +260,14 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 
 				ptr->groups.push_back(group);
 
-				if (!GameLayer::instance->groups[group]->objects.contains(ptr->section))
+				GameLayer::instance->groups[group]->objects.push_back(ptr.get());
+
+				if (!GameLayer::instance->groups[group]->objectsInSections.contains(ptr->section))
 				{
 					std::unordered_map<int, GameObject*> map;
-					GameLayer::instance->groups[group]->objects.insert({ptr->section, map});
+					GameLayer::instance->groups[group]->objectsInSections.insert({ptr->section, map});
 				}
-				GameLayer::instance->groups[group]->objects[ptr->section].insert(
+				GameLayer::instance->groups[group]->objectsInSections[ptr->section].insert(
 					{static_cast<int>(ptr->uniqueID), ptr.get()});
 			}
 			break;
@@ -309,6 +311,14 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 		}
 	}
 
+	if (ptr->isTrigger && effectPtr->spawnTriggered && ptr->groups.size() > 0)
+	{
+		for (int i : ptr->groups)
+		{
+			GameLayer::instance->groups[i]->spawnTriggered.push_back(effectPtr.get());
+		}
+	}
+
 	if (objectEntry.contains("color_type"))
 	{
 		if (objectEntry["color_type"] == "Base" || objectEntry.contains("swap_base_detail") &&
@@ -339,7 +349,6 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 	ptr->setupCustomObjects(objectEntry, ptr);
 
 	ptr->startPosition = ptr->getPosition();
-	ptr->startRotation = ptr->getRotation();
 
 	return ptr;
 }
@@ -353,56 +362,21 @@ void GameObject::updateOpacity()
 		opacityMultiplier *= GameLayer::instance->groups[i]->groupOpacity;
 	}
 
-	setOpacity(opacity);
+	setOpacityWithoutSend(opacity);
 
 	for (std::shared_ptr<Sprite>& sprite : childSprites)
 	{
 		sprite->opacityMultiplier = opacityMultiplier;
-		sprite->setOpacity(sprite->opacity);
+		sprite->setOpacityWithoutSend(sprite->opacity);
 	}
 }
 
-void GameObject::updatePosition()
+void GameObject::updatePosition(bool send)
 {
-	if (groups.size() <= 0)
-		return;
-
-	sf::Vector2f move = {0, 0};
-	float rotate = 0;
-	for (int i : groups)
-	{
-		move += GameLayer::instance->groups[i]->moveTotal;
-	}
-
-	sf::Vector2f newPosition = startPosition + rotateOffsetMovement;
-
-	for (int i : groups)
-	{
-		std::shared_ptr<Group> group = GameLayer::instance->groups[i];
-		rotate += group->rotateTotal;
-
-		if (group->rotateAround)
-		{
-			sf::Vector2f rotationPoint = group->rotateAround->getPosition();
-			float rotationAngle = group->rotateTotalMovement;
-
-			sf::Transform transform;
-			transform.rotate(rotationAngle, rotationPoint);
-
-			//newPosition += group->rotateAround->getPosition() - group->rotateAround->startPosition;
-			newPosition = transform.transformPoint(newPosition);
-		}
-	}
-
-	rotate += rotateOffset;
-
-	setPosition(newPosition + move);
-	setRotation(startRotation + rotate);
-
-	this->updateVerticesPosition();
+	this->updateVerticesPosition(send);
 
 	for (std::shared_ptr<Sprite> child : childSprites)
-		child->updateVerticesPosition();
+		child->updateVerticesPosition(send);
 }
 
 void GameObject::tryUpdateSection()
@@ -416,9 +390,7 @@ void GameObject::tryUpdateSection()
 	{
 		removeFromChannel();
 		for (auto& spr : childSprites)
-		{
 			spr->removeFromChannel();
-		}
 
 		auto&thisSectionMap = GameLayer::instance->sectionObjects[this->section];
 
@@ -433,24 +405,21 @@ void GameObject::tryUpdateSection()
 		}
 		GameLayer::instance->sectionObjects[section].insert({this->uniqueID, this});
 
-		/* if (GameLayer::instance->dirtySections.find(section) == GameLayer::instance->dirtySections.end())
-    		GameLayer::instance->dirtySections.insert(section); */
-
 		this->section = section;
 
 		for (int i : groups)
 		{
 			std::shared_ptr<Group> group = GameLayer::instance->groups[i];
-			auto groupMap = &group->objects[oldSection];
+			auto groupMap = &group->objectsInSections[oldSection];
 
 			groupMap->erase(uniqueID);
 
-			if (!group->objects.contains(section))
+			if (!group->objectsInSections.contains(section))
 			{
 				std::unordered_map<int, GameObject*> map;
-				group->objects.insert({section, map});
+				group->objectsInSections.insert({section, map});
 			}
-			group->objects[section].insert({static_cast<int>(uniqueID), this});
+			group->objectsInSections[section].insert({static_cast<int>(uniqueID), this});
 		}
 
 		removeFromBatcher();

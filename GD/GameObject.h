@@ -27,10 +27,6 @@ public:
 	std::vector<int> groups;
 
 	sf::Vector2f startPosition;
-	sf::Vector2f rotateOffsetMovement;
-
-	float rotateOffset = 0.f;
-	float startRotation = 0.f;
 
 public:
 	GameObject()
@@ -42,7 +38,7 @@ public:
 	void setupCustomObjects(nlohmann::json& objectJson, std::shared_ptr<GameObject> parent);
 
 	void updateOpacity();
-	void updatePosition();
+	void updatePosition(bool send);
 
 	void tryUpdateSection();
 };

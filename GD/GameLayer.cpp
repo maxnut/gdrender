@@ -329,19 +329,14 @@ void GameLayer::updateLevelObjects()
 	{
 		for (int i = prevSection; i < nextSection + 1; i++)
 		{
-			if (!groups[group]->objects.contains(i))
-				continue;
 			std::vector<GameObject*> updateSection;
-			auto map = &groups[group]->objects[i];
+			auto map = &groups[group]->objectsInSections[i];
 			updateSection.reserve(map->size());
 			for (auto& pair : *map)
 			{
 				GameObject* obj = pair.second;
-				if (obj)
-				{
-					obj->updatePosition();
-					updateSection.push_back(obj);
-				}
+				obj->updatePosition(true);
+				updateSection.push_back(obj);
 			}
 			for (GameObject* obj : updateSection)
 				obj->tryUpdateSection();
@@ -623,7 +618,7 @@ void GameLayer::setupObjects(std::string_view levelString)
 
 void GameLayer::updateTriggers()
 {
-	auto camPos = camera.getCenter().x / Application::zoomModifier;
+	float camPos = (camera.getCenter().x + 100.f) / Application::zoomModifier;
 
 	int curSection = Common::sectionForPos(camPos);
 
@@ -676,21 +671,6 @@ void GameLayer::updateTriggers()
 
 void GameLayer::updateVisibility()
 {
-	/* for(int i : dirtySections)
-	{
-		auto& section = sectionObjects[i];
-		for (GameObject* obj : section)
-		{
-			obj->removeFromBatcher();
-			for (std::shared_ptr<Sprite> spr : obj->childSprites)
-				spr->removeFromBatcher();
-		}
-		std::sort(sectionObjects[i].begin(), sectionObjects[i].end(), [](const auto& x, const auto& y) { return
-	x->zOrder < y->zOrder; });
-	}
-
-	dirtySections.clear(); */
-
 	auto& winSize = camera.getSize();
 	auto camPos = camera.getCenter().x / Application::zoomModifier;
 
@@ -736,16 +716,15 @@ void GameLayer::updateVisibility()
 					if (!obj || obj->currentBatcher != nullptr || !obj->enabled)
 						continue;
 
-					obj->updatePosition();
-
 					if (obj->isTrigger)
 						continue;
-
-					obj->updateOpacity();
 
 					for (std::shared_ptr<Sprite>& sprite : obj->childSprites)
 						layerObject(sprite.get());
 					layerObject(obj);
+
+					obj->updatePosition(false);
+					obj->updateOpacity();
 				}
 			}
 		}

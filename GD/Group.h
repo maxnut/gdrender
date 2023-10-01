@@ -1,20 +1,19 @@
 #pragma once
 
-#include "GameObject.h"
+#include "EffectGameObject.h"
 
 class ActionInterval;
 
 class Group
 {
 public:
-	std::unordered_map<int, std::unordered_map<int, GameObject*>> objects;
+	std::unordered_map<int, std::unordered_map<int, GameObject*>> objectsInSections;
+	std::vector<GameObject*> objects;
 	float groupOpacity = 1.0f;
 
-	sf::Vector2f moveTotal = { 0, 0 };
-	float rotateTotalMovement = 0;
-	float rotateTotal = 0;
+	bool toggle = true;
 
-	GameObject* rotateAround = nullptr;
+	std::vector<EffectGameObject*> spawnTriggered;
 
 	std::shared_ptr <ActionInterval> rotateAction = nullptr;
 public:

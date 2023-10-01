@@ -143,19 +143,15 @@ void EffectGameObject::moveAction()
 
 void EffectGameObject::toggleAction()
 {
-	for (auto pair : gameLayer->groups[targetGroupId]->objects)
+	for (GameObject* obj : gameLayer->groups[targetGroupId]->objects)
 	{
-		for (auto pair2 : pair.second)
-		{
-			GameObject* obj = pair2.second;
-			obj->enabled = activateGroup;
+		obj->enabled = activateGroup;
 
-			if (!activateGroup)
-			{
-				obj->removeFromBatcher();
-				for (std::shared_ptr<Sprite> sprite : obj->childSprites)
-					sprite->removeFromBatcher();
-			}
+		if (!activateGroup && obj->currentBatcher)
+		{
+			obj->removeFromBatcher();
+			for (std::shared_ptr<Sprite> sprite : obj->childSprites)
+				sprite->removeFromBatcher();
 		}
 	}
 }
@@ -194,18 +190,14 @@ void EffectGameObject::rotateAction()
 void EffectGameObject::stopAction()
 {
 	std::shared_ptr<Group> group = gameLayer->groups[targetGroupId];
-	for (auto pair : group->objects)
+	for (GameObject* obj : group->objects)
 	{
-		for (auto pair2 : pair.second)
+		if (obj->isTrigger)
 		{
-			GameObject* obj = pair2.second;
-			if (obj->isTrigger)
-			{
-				EffectGameObject* trigger = dynamic_cast<EffectGameObject*>(obj);
+			EffectGameObject* trigger = dynamic_cast<EffectGameObject*>(obj);
 
-				if(trigger->triggerAction)
-					trigger->triggerAction->stop();
-			}
+			if (trigger->triggerAction)
+				trigger->triggerAction->stop();
 		}
 	}
 }

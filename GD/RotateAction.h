@@ -19,5 +19,4 @@ public:
     bool init(float duration, int target, int center, float rotation, bool lock);
 
     virtual void update(float time) override;
-    void stop() override;
 };

@@ -34,7 +34,10 @@ void MoveAction::update(float time)
 
 	moveLast = moveCurrent;
 
-	targetGroup->moveTotal += deltaMovement;
+	for (GameObject* obj : this->targetGroup->objects)
+    {
+		obj->move(deltaMovement);
+    }
 
 	auto&dirty = GameLayer::instance->dirtyGroups;
 	if (dirty.find(groupID) == dirty.end())
