@@ -37,6 +37,7 @@ bool GameLayer::init(int levelID)
 	font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf");
 	framerate.setFont(font);
 	framerate.setCharacterSize(24);
+	framerate.setColor(sf::Color::Green);
 
 	loadLevel(std::to_string(levelID));
 
@@ -114,6 +115,7 @@ void GameLayer::update()
 	if (canStart && audioEngine && !audioEngine->isPlaying)
 	{
 		audioEngine->setPosition(musicOffset);
+		audioEngine->setVolume(0.3f);
 		audioEngine->play();
 	}
 

@@ -113,7 +113,7 @@ void EffectGameObject::pulseAction()
 	sf::Color fromColor = pulseType == 0 ? gameLayer->colorChannels[targetGroupId]->getColor() : sf::Color::White;
 	sf::Color originalColor = pulseType == 0 ? gameLayer->colorChannels[targetGroupId]->getNonPulseColor() : sf::Color::White;
 
-	std::shared_ptr<PulseAction> pulseAction = PulseAction::create(fadeIn, hold, fadeOut, targetGroupId, fromColor, triggerColor, originalColor, pulseType, mainOnly, detailOnly);
+	std::shared_ptr<PulseAction> pulseAction = PulseAction::create(fadeIn, hold, fadeOut, targetGroupId, triggerColor, pulseType, mainOnly, detailOnly);
 
 	gameLayer->pulseActionsActive.push_back(pulseAction);
 	this->triggerAction = pulseAction;

@@ -8,8 +8,6 @@
 #include <ctime>
 #include <thread>
 
-#define MULTITHREADING 0
-
 Application* Application::instance;
 const float Application::zoomModifier = 2.f;
 
@@ -23,13 +21,11 @@ void Application::start()
 	window = new sf::RenderWindow(sf::VideoMode(1280, 720), "GD", sf::Style::Default, settings);
 	renderTexture.create(1920, 1080);
 	framerate = 0;
-	window->setVerticalSyncEnabled(false);
-	window->setActive(!MULTITHREADING);
 
 	ImGui::SFML::Init(*window);
 
 	ImGui::GetIO().Fonts->Clear();
-	ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arial.ttf", 16);
+	ImGui::GetIO().Fonts->AddFontFromFileTTF("arial.ttf", 16);
 	ImGui::SFML::UpdateFontTexture();
 
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -40,11 +36,6 @@ void Application::start()
 	std::shared_ptr<SelectLevelLayer> layer = SelectLevelLayer::create();
 	pushLayer(layer);
 
-#if MULTITHREADING == 1
-	sf::Thread thread(&Application::draw, this);
-	thread.launch();
-#endif
-
 	auto next_frame = std::chrono::steady_clock::now();
 
 	while (window->isOpen())
@@ -54,9 +45,7 @@ void Application::start()
 
 		update();
 
-#if MULTITHREADING == 0
 		draw();
-#endif
 
 		//custom framerate lock because sfml one fucking sucks
 		if (framerate > 0)
@@ -102,22 +91,6 @@ void Application::update()
 
 void Application::draw()
 {
-#if MULTITHREADING == 1
-	while (window->isOpen())
-	{
-		window->clear(sf::Color::Blue);
-		renderTexture.clear();
-
-		renderTexture.display();
-		sf::Sprite sprite(renderTexture.getTexture());
-		sf::Vector2f scaleFactor = {1, 1};
-		scaleFactor *= (float)window->getSize().x / (float)renderTexture.getSize().x;
-		sprite.setScale(scaleFactor);
-		window->draw(sprite);
-		window->display();
-	}
-#else
-
 	window->clear(sf::Color::Blue);
 	renderTexture.clear();
 
@@ -135,7 +108,6 @@ void Application::draw()
 	ImGui::SFML::Render(*window);
 
 	window->display();
-#endif
 }
 
 void Application::onQuit()
