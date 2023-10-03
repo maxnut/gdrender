@@ -59,7 +59,7 @@ public:
 	std::shared_ptr<Batcher> gameSheet01_b1_blending;
 	std::shared_ptr<Batcher> gameSheet02;
 
-	std::array<std::shared_ptr<Batcher>, 14> batchers;
+	std::array<std::shared_ptr<Batcher>, 15> batchers;
 
 	std::shared_ptr<sf::Sprite> backgroundSprite;
 	std::shared_ptr<sf::Texture> backgroundTexture;

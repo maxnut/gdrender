@@ -9,7 +9,7 @@
 #include <thread>
 
 Application* Application::instance;
-const float Application::zoomModifier = 2.f;
+const float Application::zoomModifier = 3.1f;
 
 void Application::start()
 {

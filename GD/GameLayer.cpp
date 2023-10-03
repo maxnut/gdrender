@@ -58,15 +58,14 @@ bool GameLayer::init(int levelID)
 	gameSheet01_b2_blending = Batcher::create("Resources\\GJ_GameSheet-uhd.png", sf::BlendAdd);
 	gameSheet01_b1 = Batcher::create("Resources\\GJ_GameSheet-uhd.png");
 	gameSheet01_b1_blending = Batcher::create("Resources\\GJ_GameSheet-uhd.png", sf::BlendAdd);
+	gameSheet02 = Batcher::create("Resources\\GJ_GameSheet02-uhd.png");
+	if (!gameSheet02)
+		return false;
 
 	batchers = {gameSheet01_b1, gameSheet01_b1_blending, gameSheet01_b2, gameSheet01_b2_blending,
 				gameSheet01_b3, gameSheet01_b3_blending, gameSheet01_b4, gameSheet01_b4_blending,
 				gameSheet01_t3, gameSheet01_t3_blending, gameSheet01_t2, gameSheet01_t2_blending,
-				gameSheet01_t1, gameSheet01_t1_blending};
-
-	gameSheet02 = Batcher::create("Resources\\GJ_GameSheet02-uhd.png");
-	if (!gameSheet02)
-		return false;
+				gameSheet01_t1, gameSheet01_t1_blending, gameSheet02};
 
 	audioEngine = AudioEngine::create();
 
@@ -115,7 +114,7 @@ void GameLayer::update()
 	if (canStart && audioEngine && !audioEngine->isPlaying)
 	{
 		audioEngine->setPosition(musicOffset);
-		audioEngine->setVolume(0.3f);
+		audioEngine->setVolume(0.55f);
 		audioEngine->play();
 	}
 
@@ -620,7 +619,7 @@ void GameLayer::setupObjects(std::string_view levelString)
 
 void GameLayer::updateTriggers()
 {
-	float camPos = (camera.getCenter().x + 100.f) / Application::zoomModifier;
+	float camPos = (camera.getCenter().x) / Application::zoomModifier;
 
 	int curSection = Common::sectionForPos(camPos);
 
@@ -674,10 +673,10 @@ void GameLayer::updateTriggers()
 void GameLayer::updateVisibility()
 {
 	auto& winSize = camera.getSize();
-	auto camPos = camera.getCenter().x / Application::zoomModifier;
+	auto camPos = (camera.getCenter().x + 650.f) / Application::zoomModifier;
 
-	int prevSection = floorf((camPos - (winSize.x / 3)) / 100) + 1;
-	int nextSection = ceilf((camPos) / 100) + 3;
+	int prevSection = floorf((camPos - (winSize.x / 3)) / 100);
+	int nextSection = ceilf((camPos) / 100);
 
 	int prevPrevSection = this->prevSection - 1;
 	bool sectionInRange = prevPrevSection >= 0 && prevPrevSection < sectionObjects.size();
@@ -725,12 +724,12 @@ void GameLayer::updateVisibility()
 
 					for (std::shared_ptr<Sprite>& sprite : obj->childSprites)
 					{
-						if(obj->pendRemove)
+						if (obj->pendRemove)
 							sprite->removeFromBatcher();
 						layerObject(sprite.get());
 					}
 
-					if(obj->pendRemove)
+					if (obj->pendRemove)
 						obj->removeFromBatcher();
 					layerObject(obj);
 
