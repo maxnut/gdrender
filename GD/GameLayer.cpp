@@ -384,7 +384,7 @@ void GameLayer::loadLevel(std::string levelId)
 	}
 	else
 	{
-		std::ifstream mainLevelsFile("mainLevels.json");
+		std::ifstream mainLevelsFile(PlatformUtils::getCustomResource("mainLevels.json"));
 		nlohmann::json mainLevels = nlohmann::json::parse(mainLevelsFile);
 
 		levelString = "H4sIAAAAAAAAA" + mainLevels[levelId].get<std::string>();
