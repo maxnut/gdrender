@@ -31,3 +31,6 @@ Drag the GD resources folder and the additional resources in the build folder
 ![ss1](/images/ss1.png)
 ![ss2](/images/ss2.png)
 ![ss3](/images/ss3.png)
+![ss4](/images/ss4.png)
+![ss5](/images/ss5.png)
+![ss6](/images/ss6.png)
