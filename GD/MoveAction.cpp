@@ -37,6 +37,8 @@ void MoveAction::update(float time)
 	for (GameObject* obj : this->targetGroup->objects)
     {
 		obj->move(deltaMovement);
+
+		obj->tryUpdateSection();
     }
 
 	auto&dirty = GameLayer::instance->dirtyGroups;

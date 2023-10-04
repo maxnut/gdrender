@@ -67,6 +67,8 @@ void RotateAction::update(float time)
 
 		if (!lockRotation)
 			obj->rotate(-deltaRotation);
+
+		obj->tryUpdateSection();
 	}
 
 	auto& dirty = GameLayer::instance->dirtyGroups;

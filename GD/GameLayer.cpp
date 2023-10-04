@@ -338,9 +338,6 @@ void GameLayer::updateLevelObjects()
 				obj->updatePosition(true);
 			}
 		}
-
-		for (GameObject* obj : groups[group]->objects)
-			obj->tryUpdateSection();
 	}
 	dirtyGroups.clear();
 }
