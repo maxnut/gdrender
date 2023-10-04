@@ -34,31 +34,31 @@ bool GameLayer::init(int levelID)
 
 	instance = this;
 
-	font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf");
+	font.loadFromFile(PlatformUtils::getCustomResource("arial.ttf").string());
 	framerate.setFont(font);
 	framerate.setCharacterSize(24);
 	framerate.setColor(sf::Color::Green);
 
 	loadLevel(std::to_string(levelID));
 
-	gameSheet01_t3 = Batcher::create("Resources\\GJ_GameSheet-uhd.png");
+	gameSheet01_t3 = Batcher::create("GJ_GameSheet-uhd.png");
 	if (!gameSheet01_t3)
 		return false;
 
-	gameSheet01_t3_blending = Batcher::create("Resources\\GJ_GameSheet-uhd.png", sf::BlendAdd);
-	gameSheet01_t2 = Batcher::create("Resources\\GJ_GameSheet-uhd.png");
-	gameSheet01_t2_blending = Batcher::create("Resources\\GJ_GameSheet-uhd.png", sf::BlendAdd);
-	gameSheet01_t1 = Batcher::create("Resources\\GJ_GameSheet-uhd.png");
-	gameSheet01_t1_blending = Batcher::create("Resources\\GJ_GameSheet-uhd.png", sf::BlendAdd);
-	gameSheet01_b4 = Batcher::create("Resources\\GJ_GameSheet-uhd.png");
-	gameSheet01_b4_blending = Batcher::create("Resources\\GJ_GameSheet-uhd.png", sf::BlendAdd);
-	gameSheet01_b3 = Batcher::create("Resources\\GJ_GameSheet-uhd.png");
-	gameSheet01_b3_blending = Batcher::create("Resources\\GJ_GameSheet-uhd.png", sf::BlendAdd);
-	gameSheet01_b2 = Batcher::create("Resources\\GJ_GameSheet-uhd.png");
-	gameSheet01_b2_blending = Batcher::create("Resources\\GJ_GameSheet-uhd.png", sf::BlendAdd);
-	gameSheet01_b1 = Batcher::create("Resources\\GJ_GameSheet-uhd.png");
-	gameSheet01_b1_blending = Batcher::create("Resources\\GJ_GameSheet-uhd.png", sf::BlendAdd);
-	gameSheet02 = Batcher::create("Resources\\GJ_GameSheet02-uhd.png");
+	gameSheet01_t3_blending = Batcher::create("GJ_GameSheet-uhd.png", sf::BlendAdd);
+	gameSheet01_t2 = Batcher::create("GJ_GameSheet-uhd.png");
+	gameSheet01_t2_blending = Batcher::create("GJ_GameSheet-uhd.png", sf::BlendAdd);
+	gameSheet01_t1 = Batcher::create("GJ_GameSheet-uhd.png");
+	gameSheet01_t1_blending = Batcher::create("GJ_GameSheet-uhd.png", sf::BlendAdd);
+	gameSheet01_b4 = Batcher::create("GJ_GameSheet-uhd.png");
+	gameSheet01_b4_blending = Batcher::create("GJ_GameSheet-uhd.png", sf::BlendAdd);
+	gameSheet01_b3 = Batcher::create("GJ_GameSheet-uhd.png");
+	gameSheet01_b3_blending = Batcher::create("GJ_GameSheet-uhd.png", sf::BlendAdd);
+	gameSheet01_b2 = Batcher::create("GJ_GameSheet-uhd.png");
+	gameSheet01_b2_blending = Batcher::create("GJ_GameSheet-uhd.png", sf::BlendAdd);
+	gameSheet01_b1 = Batcher::create("GJ_GameSheet-uhd.png");
+	gameSheet01_b1_blending = Batcher::create("GJ_GameSheet-uhd.png", sf::BlendAdd);
+	gameSheet02 = Batcher::create("GJ_GameSheet02-uhd.png");
 	if (!gameSheet02)
 		return false;
 
@@ -79,11 +79,9 @@ bool GameLayer::init(int levelID)
 		}
 	}
 
-	ss << "Resources\\game_bg_" << std::setw(2) << std::setfill('0') << bgID << "_001-uhd.png";
-	std::string bgTex = ss.str();
-
 	backgroundTexture = std::shared_ptr<sf::Texture>(new sf::Texture);
-	backgroundTexture->loadFromFile(bgTex);
+	auto bgpath = PlatformUtils::getMainResource(std::format("game_bg_{:02d}_001-uhd.png", bgID));
+	backgroundTexture->loadFromFile(bgpath.string());
 
 	backgroundSprite = std::shared_ptr<sf::Sprite>(new sf::Sprite);
 	backgroundSprite->setTexture(*backgroundTexture);
@@ -773,7 +771,7 @@ void GameLayer::layerObject(Sprite* sprite)
 		blending = colorChannels[channel]->blending;
 	}
 
-	if (sprite->texDef->sheet == "Resources\\GJ_GameSheet-uhd.png")
+	if (sprite->texDef->sheet == "GJ_GameSheet-uhd.png")
 	{
 		switch (sprite->parent->zLayer)
 		{
@@ -801,7 +799,7 @@ void GameLayer::layerObject(Sprite* sprite)
 			break;
 		}
 	}
-	else if (sprite->texDef->sheet == "Resources\\GJ_GameSheet02-uhd.png")
+	else if (sprite->texDef->sheet == "GJ_GameSheet02-uhd.png")
 	{
 		targetBatcher = gameSheet02.get();
 	}

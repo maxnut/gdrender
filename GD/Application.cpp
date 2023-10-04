@@ -7,26 +7,43 @@
 #include <chrono>
 #include <ctime>
 #include <thread>
+#include "PlatformUtils.h"
 
 Application* Application::instance;
 const float Application::zoomModifier = 3.1f;
 
+Application* Application::getInstance()
+{
+	assert(Application::instance != nullptr);
+	return Application::instance;
+}
+
 void Application::start()
 {
-	instance = this;
-
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 4;
 
+	//window created in advance because if created after it doesn't register output correctly
 	window = new sf::RenderWindow(sf::VideoMode(1280, 720), "GD", sf::Style::Default, settings);
+	window->clear(sf::Color::Black);
+	window->display();
+
+	if (!PlatformUtils::updateResourcesPath())
+		return;
+
+	instance = this;
+
 	renderTexture.create(1920, 1080);
 	framerate = 0;
 
-	ImGui::SFML::Init(*window);
+	if (!ImGui::SFML::Init(*window))
+		return;
 
 	ImGui::GetIO().Fonts->Clear();
-	ImGui::GetIO().Fonts->AddFontFromFileTTF("arial.ttf", 16);
-	ImGui::SFML::UpdateFontTexture();
+	ImGui::GetIO().Fonts->AddFontFromFileTTF(PlatformUtils::getCustomResource("arial.ttf").string().c_str(), 16);
+
+	if (!ImGui::SFML::UpdateFontTexture())
+		return;
 
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.ScaleAllSizes(2.f);

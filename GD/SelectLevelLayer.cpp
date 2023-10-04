@@ -18,10 +18,10 @@ std::shared_ptr<SelectLevelLayer> SelectLevelLayer::create()
 
 bool SelectLevelLayer::init()
 {
-	ImageLoader::ParsePlist("Resources\\GJ_GameSheet-uhd.plist");
-	ImageLoader::ParsePlist("Resources\\GJ_GameSheet02-uhd.plist");
-	ImageLoader::ParsePlist("Resources\\GJ_GameSheet03-uhd.plist");
-	ImageLoader::ParsePlist("Resources\\GJ_GameSheet04-uhd.plist");
+	ImageLoader::ParsePlist("GJ_GameSheet-uhd.plist");
+	ImageLoader::ParsePlist("GJ_GameSheet02-uhd.plist");
+	ImageLoader::ParsePlist("GJ_GameSheet03-uhd.plist");
+	ImageLoader::ParsePlist("GJ_GameSheet04-uhd.plist");
 
 	searchStr[0] = 0;
 	searchStrPersistent[0] = 0;

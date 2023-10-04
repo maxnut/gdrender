@@ -6,6 +6,7 @@
 #include "LongData.h"
 #include "EffectGameObject.h"
 #include "tsl/ordered_map.h"
+#include "PlatformUtils.h"
 
 nlohmann::json GameObject::objJson;
 
@@ -69,7 +70,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 {
 	if (objJson.empty())
 	{
-		std::ifstream file("object.json");
+		std::ifstream file(PlatformUtils::getCustomResource("object.json"));
 		objJson = nlohmann::json::parse(file);
 	}
 
@@ -384,7 +385,7 @@ void GameObject::tryUpdateSection()
 	int section = Common::sectionForPos(getPosition().x);
 	section = section - 1 < 0 ? 0 : section - 1;
 
-	if(section > GameLayer::instance->nextSection || section < GameLayer::instance->prevSection)
+	if (section > GameLayer::instance->nextSection || section < GameLayer::instance->prevSection)
 		return;
 
 	int oldSection = this->section;
@@ -395,7 +396,7 @@ void GameObject::tryUpdateSection()
 		for (auto& spr : childSprites)
 			spr->removeFromChannel();
 
-		auto&thisSectionMap = GameLayer::instance->sectionObjects[this->section];
+		auto& thisSectionMap = GameLayer::instance->sectionObjects[this->section];
 
 		thisSectionMap.erase(this->uniqueID);
 
