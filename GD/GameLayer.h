@@ -80,6 +80,8 @@ public:
 	std::unordered_set<int> dirtyChannels;
 	std::unordered_set<int> dirtyGroups;
 
+	std::unordered_set<int> pulsedGroups;
+
 	std::array<std::shared_ptr<ColorChannel>, 1013> colorChannels;
 	std::array<std::shared_ptr<Group>, 1013> groups;
 

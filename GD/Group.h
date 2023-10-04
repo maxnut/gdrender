@@ -11,8 +11,6 @@ public:
 	std::vector<GameObject*> objects;
 	float groupOpacity = 1.0f;
 
-	bool toggle = true;
-
 	std::vector<EffectGameObject*> spawnTriggered;
 
 	std::shared_ptr <ActionInterval> rotateAction = nullptr;

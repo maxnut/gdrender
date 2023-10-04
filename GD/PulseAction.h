@@ -12,6 +12,8 @@ private:
 	sf::Color to;
 	HSV hsvModifier;
 
+	sf::Color copyChannel1, copyChannel2;
+
 	float fadein, hold, fadeout;
 
 	bool mainOnly, detailOnly;
@@ -21,6 +23,8 @@ public:
 
 	void applyToSpriteIn(Sprite* spr, float fadetime);
 	void applyToSpriteOut(Sprite* spr, float fadetime);
+
+	void getCopyColors(GameObject* obj);
 
 	virtual void update(float time) override;
 };

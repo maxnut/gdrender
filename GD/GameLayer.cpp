@@ -230,6 +230,7 @@ void GameLayer::processColorActions()
 		if (ac->isDone())
 			toRemovePulse.push_back(ac);
 	}
+	pulsedGroups.clear();
 
 	for (auto& ac : opacityActionsActive)
 	{

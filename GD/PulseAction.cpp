@@ -56,16 +56,14 @@ void PulseAction::applyToSpriteIn(Sprite* spr, float fadetime)
 		return;
 
 	if (this->pulsemode == 1)
-	{
-		sf::Color copyColor = copy <= 0 ? spr->channel->getColor() : GameLayer::instance->colorChannels[copy]->getColor();
-		to = HSV::combine(copyColor, hsvModifier);
-	}
+		to = spr->channelType == 1 ? copyChannel1 : copyChannel2;
 
 	sf::Color channelcolor = spr->channel->getColor();
 	sf::Uint8 r1 = static_cast<sf::Uint8>(to.r - (float)(to.r - channelcolor.r) * (1.f - fadetime));
 	sf::Uint8 g1 = static_cast<sf::Uint8>(to.g - (float)(to.g - channelcolor.g) * (1.f - fadetime));
 	sf::Uint8 b1 = static_cast<sf::Uint8>(to.b - (float)(to.b - channelcolor.b) * (1.f - fadetime));
-	spr->setColor({r1, g1, b1});
+	if (spr->getColor() != to)
+		spr->setColor({r1, g1, b1});
 }
 
 void PulseAction::applyToSpriteOut(Sprite* spr, float fadetime)
@@ -75,16 +73,14 @@ void PulseAction::applyToSpriteOut(Sprite* spr, float fadetime)
 		return;
 
 	if (this->pulsemode == 1)
-	{
-		sf::Color copyColor = copy <= 0 ? spr->channel->getColor() : GameLayer::instance->colorChannels[copy]->getColor();
-		to = HSV::combine(copyColor, hsvModifier);
-	}
+		to = spr->channelType == 1 ? copyChannel1 : copyChannel2;
 
 	sf::Color channelcolor = spr->channel->getColor();
 	sf::Uint8 r1 = static_cast<sf::Uint8>(to.r - (float)(to.r - channelcolor.r) * (fadetime));
 	sf::Uint8 g1 = static_cast<sf::Uint8>(to.g - (float)(to.g - channelcolor.g) * (fadetime));
 	sf::Uint8 b1 = static_cast<sf::Uint8>(to.b - (float)(to.b - channelcolor.b) * (fadetime));
-	spr->setColor({r1, g1, b1});
+	if (spr->getColor() != to)
+		spr->setColor({r1, g1, b1});
 }
 
 void PulseAction::update(float time)
@@ -95,7 +91,8 @@ void PulseAction::update(float time)
 		{
 			copy = copy <= 0 ? target : copy;
 			sf::Color copyColor = GameLayer::instance->colorChannels[copy]->getColor();
-			to = HSV::combine(copyColor, hsvModifier);
+			if (to != copyColor)
+				to = HSV::combine(copyColor, hsvModifier);
 		}
 
 		if (time <= fadein)
@@ -139,6 +136,11 @@ void PulseAction::update(float time)
 	}
 	else
 	{
+		if (GameLayer::instance->pulsedGroups.contains(target))
+			return;
+		else
+			GameLayer::instance->pulsedGroups.insert(target);
+
 		if (time <= fadein)
 		{
 			float fadetime = time / fadein;
@@ -151,6 +153,9 @@ void PulseAction::update(float time)
 				for (auto& pair : group->objectsInSections[i])
 				{
 					GameObject* obj = pair.second;
+					if (this->pulsemode == 1)
+						getCopyColors(obj);
+
 					applyToSpriteIn(obj, fadetime);
 					for (auto spr : obj->childSprites)
 						applyToSpriteIn(spr.get(), fadetime);
@@ -168,6 +173,9 @@ void PulseAction::update(float time)
 				for (auto& pair : group->objectsInSections[i])
 				{
 					GameObject* obj = pair.second;
+					if (this->pulsemode == 1)
+						getCopyColors(obj);
+
 					applyToSpriteOut(obj, fadetime);
 					for (auto spr : obj->childSprites)
 						applyToSpriteOut(spr.get(), fadetime);
@@ -182,11 +190,32 @@ void PulseAction::update(float time)
 				for (auto& pair : group->objectsInSections[i])
 				{
 					GameObject* obj = pair.second;
+					if (this->pulsemode == 1)
+						getCopyColors(obj);
+
 					applyToSpriteIn(obj, fadein + hold);
 					for (auto spr : obj->childSprites)
 						applyToSpriteIn(spr.get(), fadein + hold);
 				}
 			}
 		}
+	}
+}
+
+void PulseAction::getCopyColors(GameObject* obj)
+{
+	if (obj->primaryColorChannel > 0)
+	{
+		sf::Color copyColor = copy <= 0 ? GameLayer::instance->colorChannels[obj->primaryColorChannel]->getColor()
+										: GameLayer::instance->colorChannels[copy]->getColor();
+		if (copyChannel1 != copyColor)
+			copyChannel1 = HSV::combine(copyColor, hsvModifier);
+	}
+	if (obj->secondaryColorChannel > 0)
+	{
+		sf::Color copyColor = copy <= 0 ? GameLayer::instance->colorChannels[obj->secondaryColorChannel]->getColor()
+										: GameLayer::instance->colorChannels[copy]->getColor();
+		if (copyChannel2 != copyColor)
+			copyChannel2 = HSV::combine(copyColor, hsvModifier);
 	}
 }
