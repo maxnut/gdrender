@@ -384,6 +384,9 @@ void GameObject::tryUpdateSection()
 	int section = Common::sectionForPos(getPosition().x);
 	section = section - 1 < 0 ? 0 : section - 1;
 
+	if(section > GameLayer::instance->nextSection || section < GameLayer::instance->prevSection)
+		return;
+
 	int oldSection = this->section;
 
 	if (this->section != section)

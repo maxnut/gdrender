@@ -29,7 +29,7 @@ std::shared_ptr<GameLayer> GameLayer::create(int levelID)
 
 bool GameLayer::init(int levelID)
 {
-	camera = sf::View(sf::FloatRect(-950.f, -950.f, 1920, 1080));
+	camera = sf::View(sf::FloatRect(-650.f, -950.f, 1920, 1080));
 	//camera.zoom(0.3f);
 
 	instance = this;
@@ -167,10 +167,11 @@ void GameLayer::moveCamera()
 {
 	Application* app = Application::instance;
 
-	float speed = app->keyPressedMap[sf::Keyboard::LShift] ? 1000.f : 500.f;
+	float speed = app->keyPressedMap[sf::Keyboard::LShift] ? 700.f : 300.f;
 	float step = app->deltaTime * 60.0f;
 	float movementX = canStart && move ? (float)((double)step * xVel * camSpeed) : 0;
 	movementX *= Application::zoomModifier;
+	speed *= Application::zoomModifier;
 
 	sf::Vector2f prev = camera.getCenter() / Application::zoomModifier;
 
@@ -330,18 +331,16 @@ void GameLayer::updateLevelObjects()
 	{
 		for (int i = prevSection; i < nextSection + 1; i++)
 		{
-			std::vector<GameObject*> updateSection;
 			auto map = &groups[group]->objectsInSections[i];
-			updateSection.reserve(map->size());
 			for (auto& pair : *map)
 			{
 				GameObject* obj = pair.second;
 				obj->updatePosition(true);
-				updateSection.push_back(obj);
 			}
-			for (GameObject* obj : updateSection)
-				obj->tryUpdateSection();
 		}
+
+		for (GameObject* obj : groups[group]->objects)
+			obj->tryUpdateSection();
 	}
 	dirtyGroups.clear();
 }
@@ -631,7 +630,7 @@ void GameLayer::updateTriggers()
 			for (auto& pair : section)
 			{
 				GameObject* obj = pair.second;
-				if (obj->getPosition().x > camera.getCenter().x / Application::zoomModifier)
+				if (obj->getPosition().x > (camera.getCenter().x - 200.f) / Application::zoomModifier)
 					continue;
 
 				if (obj->isTrigger)

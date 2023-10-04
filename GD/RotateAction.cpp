@@ -58,7 +58,7 @@ void RotateAction::update(float time)
 	sf::Transform tr;
 
 	if(rotateAround)
-		tr.rotate(deltaRotation, rotateAround->getPosition());
+		tr.rotate(-deltaRotation, rotateAround->getPosition());
 
 	for (GameObject* obj : this->targetGroup->objects)
 	{
@@ -66,7 +66,7 @@ void RotateAction::update(float time)
 			obj->setPosition(tr.transformPoint(obj->getPosition()));
 
 		if (!lockRotation)
-			obj->rotate(deltaRotation);
+			obj->rotate(-deltaRotation);
 	}
 
 	auto& dirty = GameLayer::instance->dirtyGroups;

@@ -103,17 +103,7 @@ void EffectGameObject::colorAction()
 
 void EffectGameObject::pulseAction()
 {
-	if (pulseMode == 1)
-	{
-		copyColorID = copyColorID == -2 ? targetGroupId : copyColorID;
-		sf::Color copyColor = gameLayer->colorChannels[copyColorID] ? gameLayer->colorChannels[copyColorID]->getColor() : sf::Color::White;
-		triggerColor = HSV::combine(copyColor, copyColorHSV);
-	}
-
-	sf::Color fromColor = pulseType == 0 ? gameLayer->colorChannels[targetGroupId]->getColor() : sf::Color::White;
-	sf::Color originalColor = pulseType == 0 ? gameLayer->colorChannels[targetGroupId]->getNonPulseColor() : sf::Color::White;
-
-	std::shared_ptr<PulseAction> pulseAction = PulseAction::create(fadeIn, hold, fadeOut, targetGroupId, triggerColor, pulseType, mainOnly, detailOnly);
+	std::shared_ptr<PulseAction> pulseAction = PulseAction::create(fadeIn, hold, fadeOut, targetGroupId, triggerColor, copyColorID, copyColorHSV, pulseType, pulseMode, mainOnly, detailOnly);
 
 	gameLayer->pulseActionsActive.push_back(pulseAction);
 	this->triggerAction = pulseAction;
