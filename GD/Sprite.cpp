@@ -22,7 +22,7 @@ void Sprite::updateVerticesPosition(bool send)
 	for (int i = 0; i < 4; ++i)
 	{
 		updateVertexPosition(i, combinedTransform);
-		if(send)
+		if (send)
 			sendVertex(i);
 	}
 }
@@ -58,7 +58,7 @@ void Sprite::sendVertex(int index)
 	size_t atIndex = atlasIndex * 4;
 
 	//TODO: temporary solution, find out what's causing this
-	if(atIndex > currentBatcher->vertices.size())
+	if (atIndex > currentBatcher->vertices.size())
 		return;
 
 	currentBatcher->vertices[atIndex + index] = vertices[index];
@@ -99,6 +99,13 @@ void Sprite::setOpacity(sf::Uint8 opacity)
 
 void Sprite::setOpacityWithoutSend(sf::Uint8 opacity)
 {
+	if (this->channel && this->channel->blending)
+	{
+		double transformed_opacity = std::clamp(
+			(0.175656971639325 * std::pow(7.06033051530761, static_cast<double>(opacity / 255.f)) - 0.213355914301931),
+			0.0, 1.0);
+		opacity = static_cast<float>(transformed_opacity) * 255.f;
+	}
 	this->opacity = opacity;
 	for (int i = 0; i < 4; i++)
 	{
