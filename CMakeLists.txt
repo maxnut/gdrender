@@ -44,6 +44,7 @@ add_executable(gdrender
     GD/RotateAction.cpp
     GD/SelectLevelLayer.cpp
     GD/Sequence.cpp
+    GD/SharedPool.cpp
     GD/SpawnAction.cpp
     GD/Sprite.cpp
     GD/Tween.cpp
@@ -64,6 +65,7 @@ target_include_directories(gdrender PRIVATE
     GD/include/imgui
     GD/include/imgui-SFML
     GD/include/raudio
+    GD/include/thread-pool/include
 )
 
 target_compile_definitions(gdrender PRIVATE 

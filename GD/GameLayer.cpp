@@ -13,6 +13,8 @@
 #include "PlatformUtils.h"
 #include <format>
 
+#include "SharedPool.hpp"
+
 #include "ReplayPlayer.h"
 
 GameLayer* GameLayer::instance;
@@ -598,18 +600,24 @@ void GameLayer::setupObjects(std::string_view levelString)
 
 	objects.reserve(objData.size());
 
-	for (const std::string_view& objectDataSpecific : objData)
-	{
-		std::shared_ptr<GameObject> obj = GameObject::createFromString(objectDataSpecific);
-		if (obj)
+	std::mutex objsMutex;
+	sharedPool().parallelize_loop(0, objData.size(), [this, objData, &objsMutex](unsigned int a, unsigned int b) {
+		for (unsigned int i = a; i < b; i++)
 		{
-			objects.push_back(obj);
-			obj->objectIndex = GameLayer::instance->objects.size() - 1;
+			std::shared_ptr<GameObject> obj = GameObject::createFromString(objData.at(i));
+			if (obj)
+			{
+				std::unique_lock lock(objsMutex);
+				objects.push_back(obj);
+				lock.unlock();
 
-			if (obj->getPosition().x > lastObjXPos)
-				lastObjXPos = obj->getPosition().x;
+				obj->objectIndex = GameLayer::instance->objects.size() - 1;
+
+				if (obj->getPosition().x > lastObjXPos)
+					lastObjXPos = obj->getPosition().x;
+			}
 		}
-	}
+	}).wait();
 }
 
 void GameLayer::updateTriggers()
@@ -622,7 +630,7 @@ void GameLayer::updateTriggers()
 	{
 		if (i < sectionObjects.size() && i >= 0)
 		{
-			auto& section = sectionObjects[i];
+			auto& section = sectionObjects.at(i);
 			for (auto& pair : section)
 			{
 				GameObject* obj = pair.second;
