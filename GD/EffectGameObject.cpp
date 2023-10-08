@@ -6,10 +6,10 @@
 
 void EffectGameObject::triggerActivated()
 {
-	if(wasTriggerActivated)
+	if (wasTriggerActivated)
 		return;
 
-	if(!multiActivate || !spawnTriggered)
+	if (!multiActivate || !spawnTriggered)
 		wasTriggerActivated = true;
 
 	if (objectID == 29)
@@ -18,7 +18,7 @@ void EffectGameObject::triggerActivated()
 		targetColorId = 1001;
 	else if (objectID == 105)
 		targetColorId = 1004;
-	
+
 	switch (objectID)
 	{
 	case 29:
@@ -45,13 +45,16 @@ void EffectGameObject::triggerActivated()
 	case 1346:
 		rotateAction();
 		break;
+	case 1347:
+		followAction();
+		break;
 	case 1616:
 		stopAction();
 		break;
 	}
 }
 
-void EffectGameObject::colorAction() 
+void EffectGameObject::colorAction()
 {
 	std::shared_ptr<ActionInterval> foundAction = gameLayer->colorChannels[targetColorId]->colorActionChannel;
 	if (foundAction)
@@ -62,7 +65,7 @@ void EffectGameObject::colorAction()
 		gameLayer->colorChannels[targetColorId]->blending = blending;
 		for (int i = gameLayer->prevSection; i < gameLayer->nextSection + 1; i++)
 		{
-			for (auto&pair : gameLayer->colorChannels[targetColorId]->channelSprites[i])
+			for (auto& pair : gameLayer->colorChannels[targetColorId]->channelSprites[i])
 			{
 				Sprite* spr = pair.second;
 				spr->removeFromBatcher();
@@ -73,10 +76,11 @@ void EffectGameObject::colorAction()
 
 	if (copyColorID <= 0)
 	{
-		auto colorAction = ColorAction::create(duration, targetColorId, gameLayer->colorChannels[targetColorId]->getColor(), triggerColor);
+		auto colorAction = ColorAction::create(duration, targetColorId,
+											   gameLayer->colorChannels[targetColorId]->getColor(), triggerColor);
 		if (gameLayer->colorChannels[targetColorId]->copyColor)
 		{
-			std::vector<ColorChannel*> *copiers = &gameLayer->colorChannels[targetColorId]->copyColor->copiers;
+			std::vector<ColorChannel*>* copiers = &gameLayer->colorChannels[targetColorId]->copyColor->copiers;
 			auto foundInd = std::find(copiers->begin(), copiers->end(), gameLayer->colorChannels[targetColorId].get());
 			if (foundInd != copiers->end())
 				copiers->erase(foundInd);
@@ -91,45 +95,42 @@ void EffectGameObject::colorAction()
 	{
 		if (!gameLayer->colorChannels[copyColorID])
 			return;
-		std::shared_ptr<CopyColorAction> copyColorAction = CopyColorAction::create(duration, gameLayer->colorChannels[targetColorId].get(), gameLayer->colorChannels[copyColorID].get(), copyColorHSV, targetColorId);
+		std::shared_ptr<CopyColorAction> copyColorAction =
+			CopyColorAction::create(duration, gameLayer->colorChannels[targetColorId].get(),
+									gameLayer->colorChannels[copyColorID].get(), copyColorHSV, targetColorId);
 		gameLayer->colorChannels[targetColorId]->colorActionChannel = copyColorAction;
 		gameLayer->copyColorActionsActive.push_back(copyColorAction);
 		this->triggerAction = copyColorAction;
 	}
 }
 
-
-
-
 void EffectGameObject::pulseAction()
 {
-	std::shared_ptr<PulseAction> pulseAction = PulseAction::create(fadeIn, hold, fadeOut, targetGroupId, triggerColor, copyColorID, copyColorHSV, pulseType, pulseMode, mainOnly, detailOnly);
+	std::shared_ptr<PulseAction> pulseAction =
+		PulseAction::create(fadeIn, hold, fadeOut, targetGroupId, triggerColor, copyColorID, copyColorHSV, pulseType,
+							pulseMode, mainOnly, detailOnly);
 
 	gameLayer->pulseActionsActive.push_back(pulseAction);
 	this->triggerAction = pulseAction;
 }
 
-
-
 void EffectGameObject::opacityAction()
 {
-	std::shared_ptr<OpacityAction> opacityAction = OpacityAction::create(duration, targetGroupId, gameLayer->groups[targetGroupId]->groupOpacity, triggerColor.a / 255.f);
+	std::shared_ptr<OpacityAction> opacityAction = OpacityAction::create(
+		duration, targetGroupId, gameLayer->groups[targetGroupId]->groupOpacity, triggerColor.a / 255.f);
 	gameLayer->opacityActionsActive.push_back(opacityAction);
 	this->triggerAction = opacityAction;
 }
 
-
-
 void EffectGameObject::moveAction()
 {
-	std::shared_ptr<MoveAction> moveAction = MoveAction::create(duration, targetGroupId, movement, lockPlayerX, lockPlayerY);
+	std::shared_ptr<MoveAction> moveAction =
+		MoveAction::create(duration, targetGroupId, movement, lockPlayerX, lockPlayerY);
 
 	gameLayer->moveActionsActive.push_back(actionEasing(moveAction, easeRate));
 
 	this->triggerAction = moveAction;
 }
-
-
 
 void EffectGameObject::toggleAction()
 {
@@ -139,32 +140,30 @@ void EffectGameObject::toggleAction()
 
 		if (!activateGroup && obj->currentBatcher)
 		{
-			obj->removeFromBatcher();
-			for (std::shared_ptr<Sprite> sprite : obj->childSprites)
+			for (std::shared_ptr<Sprite>& sprite : obj->childSprites)
 				sprite->removeFromBatcher();
+
+			obj->removeFromBatcher();
 		}
 	}
 }
 
-
-
 void EffectGameObject::spawnAction()
 {
 	std::shared_ptr<SpawnAction> spawnAction = SpawnAction::create(spawnDelay, gameLayer->groups[targetGroupId]);
-	
+
 	gameLayer->spawnActionsActive.push_back(spawnAction);
 
 	this->triggerAction = spawnAction;
 }
-
-
 
 void EffectGameObject::rotateAction()
 {
 	if (gameLayer->groups[targetGroupId]->rotateAction != nullptr)
 		gameLayer->groups[targetGroupId]->rotateAction->stop();
 
-	std::shared_ptr<RotateAction> rotateAction = RotateAction::create(duration, targetGroupId, secondaryTargetGroupId, (360 * times360) + degrees, lockRotation);
+	std::shared_ptr<RotateAction> rotateAction =
+		RotateAction::create(duration, targetGroupId, secondaryTargetGroupId, (360 * times360) + degrees, lockRotation);
 
 	if (!rotateAction)
 		return;
@@ -174,8 +173,6 @@ void EffectGameObject::rotateAction()
 	gameLayer->rotateActionsActive.push_back(easeAction);
 	this->triggerAction = easeAction;
 }
-
-
 
 void EffectGameObject::stopAction()
 {
@@ -192,7 +189,14 @@ void EffectGameObject::stopAction()
 	}
 }
 
+void EffectGameObject::followAction()
+{
+	std::shared_ptr<FollowAction> followAction = FollowAction::create(duration, targetGroupId, secondaryTargetGroupId, xMod, yMod);
 
+	gameLayer->followActionsActive.push_back(followAction);
+
+	this->triggerAction = followAction;
+}
 
 std::shared_ptr<ActionInterval> EffectGameObject::actionEasing(std::shared_ptr<ActionInterval> base, float rate)
 {

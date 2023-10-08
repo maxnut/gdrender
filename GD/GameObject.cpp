@@ -303,6 +303,12 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 		case 71:
 			effectPtr->secondaryTargetGroupId = Common::stoi(properties[i + 1]);
 			break;
+		case 72:
+			effectPtr->xMod = Common::stof(properties[i + 1]);
+			break;
+		case 73:
+			effectPtr->yMod = Common::stof(properties[i + 1]);
+			break;
 		case 85:
 			effectPtr->easeRate = Common::stof(properties[i + 1]);
 			break;
@@ -426,7 +432,6 @@ void GameObject::tryUpdateSection()
 			group->objectsInSections[section].insert({static_cast<int>(uniqueID), this});
 		}
 
-		pendRemove = true;
 		addToChannelSection();
 		for (std::shared_ptr<Sprite> spr : childSprites)
 		{

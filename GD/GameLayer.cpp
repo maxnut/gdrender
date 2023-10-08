@@ -212,6 +212,7 @@ void GameLayer::processColorActions()
 	std::deque<std::shared_ptr<ActionInterval>> toRemoveMove;
 	std::deque<std::shared_ptr<SpawnAction>> toRemoveSpawn;
 	std::deque<std::shared_ptr<ActionInterval>> toRemoveRotate;
+	std::deque<std::shared_ptr<FollowAction>> toRemoveFollow;
 
 	for (auto& ac : colorActionsActive)
 	{
@@ -273,6 +274,14 @@ void GameLayer::processColorActions()
 			toRemoveRotate.push_back(ac);
 	}
 
+	for (auto& ac : followActionsActive)
+	{
+		ac->step(Application::instance->deltaTime);
+
+		if (ac->isDone())
+			toRemoveFollow.push_back(ac);
+	}
+
 	for (auto& ac : toRemoveColor)
 		colorActionsActive.erase(std::find(colorActionsActive.begin(), colorActionsActive.end(), ac));
 
@@ -296,6 +305,9 @@ void GameLayer::processColorActions()
 
 	for (auto& ac : toRemoveRotate)
 		rotateActionsActive.erase(std::find(rotateActionsActive.begin(), rotateActionsActive.end(), ac));
+
+	for (auto& ac : toRemoveFollow)
+		followActionsActive.erase(std::find(followActionsActive.begin(), followActionsActive.end(), ac));
 }
 
 void GameLayer::updateLevelObjects()
@@ -328,6 +340,7 @@ void GameLayer::updateLevelObjects()
 
 	for (int group : dirtyGroups)
 	{
+		groups[group]->moveDelta = {0, 0};
 		for (int i = prevSection; i < nextSection + 1; i++)
 		{
 			auto map = &groups[group]->objectsInSections[i];
@@ -399,6 +412,8 @@ void GameLayer::loadLevel(std::string levelId)
 
 	if (objects.size() != 0)
 	{
+		std::sort(objects.begin(), objects.end(), [](const auto& x, const auto& y) { return x->zLayer < y->zLayer; });
+
 		for (size_t i = 0; i < Common::sectionForPos(lastObjXPos); i++)
 		{
 			std::unordered_map<int, GameObject*> map;
@@ -709,23 +724,15 @@ void GameLayer::updateVisibility()
 				for (auto& pair : *section)
 				{
 					GameObject* obj = pair.second;
-					if (!obj || (obj->currentBatcher != nullptr && !obj->pendRemove) || !obj->enabled)
+					if (!obj || (obj->currentBatcher != nullptr) || !obj->enabled)
 						continue;
 
 					if (obj->isTrigger)
 						continue;
 
-					obj->pendRemove = false;
-
 					for (std::shared_ptr<Sprite>& sprite : obj->childSprites)
-					{
-						if (obj->pendRemove)
-							sprite->removeFromBatcher();
 						layerObject(sprite.get());
-					}
 
-					if (obj->pendRemove)
-						obj->removeFromBatcher();
 					layerObject(obj);
 
 					obj->updatePosition(false);

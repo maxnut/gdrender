@@ -32,6 +32,8 @@ void MoveAction::update(float time)
 	if (followPlayerY)
 		deltaMovement.y = GameLayer::instance->deltaMove.y;
 
+	this->targetGroup->moveDelta = deltaMovement;
+
 	moveLast = moveCurrent;
 
 	for (GameObject* obj : this->targetGroup->objects)

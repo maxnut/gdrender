@@ -36,6 +36,7 @@ add_executable(gdrender
     GD/Level.cpp
     GD/main.cpp
     GD/MoveAction.cpp
+    GD/FollowAction.cpp
     GD/OpacityAction.cpp
     GD/Plist.cpp
     GD/PlistDate.cpp

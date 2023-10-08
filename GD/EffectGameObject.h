@@ -16,6 +16,7 @@ public:
 	float easeRate = 1.f;
 	float fadeIn = 0.f, hold = 0.f, fadeOut = 0.f;
 	float spawnDelay = 0.f;
+	float xMod = 1.f, yMod = 1.f;
 
 	int targetColorId = 1, targetGroupId = 1, secondaryTargetGroupId = 1;
 	int pulseMode, pulseType;
@@ -41,6 +42,7 @@ public:
 	void spawnAction();
 	void rotateAction();
 	void stopAction();
+	void followAction();
 
 	std::shared_ptr<ActionInterval> actionEasing(std::shared_ptr<ActionInterval> base, float rate = 0);
 };

@@ -34,8 +34,6 @@ public:
 
     size_t uniqueID = 0;
 
-    bool pendRemove = false;
-
     float opacityMultiplier = 1.0f;
 public:
 

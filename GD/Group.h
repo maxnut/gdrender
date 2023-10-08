@@ -11,6 +11,8 @@ public:
 	std::vector<GameObject*> objects;
 	float groupOpacity = 1.0f;
 
+	sf::Vector2f moveDelta = {0, 0};
+
 	std::vector<EffectGameObject*> spawnTriggered;
 
 	std::shared_ptr <ActionInterval> rotateAction = nullptr;

@@ -11,6 +11,7 @@
 #include "RotateAction.h"
 #include "MoveAction.h"
 #include "SpawnAction.h"
+#include "FollowAction.h"
 #include "Group.h"
 #include "AudioEngine.h"
 #include "ReplayPlayer.h"
@@ -77,6 +78,7 @@ public:
 	std::vector<std::shared_ptr<SpawnAction>> spawnActionsActive;
 	std::vector<std::shared_ptr<SpawnAction>> spawnActionsPending;
 	std::vector<std::shared_ptr<ActionInterval>> rotateActionsActive;
+	std::vector<std::shared_ptr<FollowAction>> followActionsActive;
 	std::unordered_set<int> dirtyChannels;
 	std::unordered_set<int> dirtyGroups;
 
