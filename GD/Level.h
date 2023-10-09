@@ -16,7 +16,8 @@ public:
 	std::string name{};
 	std::string description{};
 
-	float length;
+	float length = 0;
+	bool localLevel = 0;
 
 public:
 	static std::string decompressLvlStr(std::string compressedLvlStr);

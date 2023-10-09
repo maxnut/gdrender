@@ -107,8 +107,11 @@ public:
 
 public:
 	static std::shared_ptr<GameLayer> create(int levelID);
+	static std::shared_ptr<GameLayer> createWithLevelString(std::string_view lvlstr);
 
 	bool init(int levelID);
+	bool initWithLevelString(std::string_view lvlstr);
+	bool initializeMembers();
 	void update() override;
 	void draw() override;
 
@@ -120,6 +123,7 @@ public:
 	void onExit() override;
 
 	void loadLevel(std::string levelId);
+	void loadLevelFromLevelString(std::string_view levelString);
 	void setupLevel(std::string_view levelStr);
 	void setupObjects(std::string_view levelStr);
 

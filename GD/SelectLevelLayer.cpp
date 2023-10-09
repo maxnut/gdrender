@@ -5,6 +5,9 @@
 
 #include <cpr/cpr.h>
 #include "Common.h"
+#include "base64.h"
+#include "PlatformUtils.h"
+#include <fstream>
 
 std::shared_ptr<SelectLevelLayer> SelectLevelLayer::create()
 {
@@ -27,6 +30,80 @@ bool SelectLevelLayer::init()
 	searchStrPersistent[0] = 0;
 
 	return true;
+}
+
+static std::optional<std::string> getLocalLevelsXml()
+{
+	auto appdata = PlatformUtils::getGDAppdata();
+	if (!appdata)
+		return {};
+
+	auto file = appdata.value() / "CCLocalLevels.dat";
+	std::ifstream f(file);
+	if (!f.good())
+		return {};
+
+	std::string xmlstr(std::istreambuf_iterator<char>{f}, {});
+
+	Common::xorString(xmlstr, 11);
+	xmlstr = GameLevel::decompressLvlStr(xmlstr);
+	return xmlstr;
+}
+static std::optional<std::vector<std::string>> getLevelNamesFromLocalLevels()
+{
+	auto xmlopt = getLocalLevelsXml();
+	if (!xmlopt)
+		return {};
+
+	auto& xmlstr = xmlopt.value();
+
+	auto pos = xmlstr.find("<k>k2</k>");
+
+	if (pos == std::string_view::npos)
+		return {};
+
+	std::vector<std::string> names;
+	while (pos != std::string_view::npos)
+	{
+		auto tagStart = xmlstr.find("<s>", pos);
+		auto tagEnd = xmlstr.find("</s>", tagStart);
+		auto beginning = xmlstr.begin();
+		names.emplace_back(beginning + tagStart + 3, beginning + tagEnd);
+		pos = xmlstr.find("<k>k2</k>", pos + 9);
+	}
+	return names;
+}
+
+static std::optional<std::string> getLevelStringFromLocalLevels(std::string_view levelName)
+{
+	auto xmlopt = getLocalLevelsXml();
+	if (!xmlopt)
+		return {};
+
+	auto& xmlstr = xmlopt.value();
+
+	auto pos = xmlstr.find("<k>k2</k>");
+	if (pos == std::string_view::npos)
+		return {};
+
+	while (pos != std::string_view::npos)
+	{
+		auto tagStart = xmlstr.find("<s>", pos);
+		auto tagEnd = xmlstr.find("</s>", tagStart);
+		auto beginning = xmlstr.begin();
+		std::string_view name(beginning + tagStart + 3, beginning + tagEnd);
+		if (name == levelName)
+		{
+			tagStart = xmlstr.find("<k>k4</k>", tagEnd);
+			tagStart = xmlstr.find("<s>", tagStart);
+			tagEnd = xmlstr.find("</s>", tagStart);
+			auto b = xmlstr.begin();
+			std::string levelString(b + tagStart + 3, b + tagEnd);
+			return GameLevel::decompressLvlStr(levelString);
+		}
+		pos = xmlstr.find("<k>k2</k>", pos + 9);
+	}
+	return {};
 }
 
 void SelectLevelLayer::draw()
@@ -93,6 +170,23 @@ void SelectLevelLayer::draw()
 		audioEngine->update();
 	}
 
+	ImGui::SameLine();
+	if (ImGui::Button("Show editor levels"))
+	{
+		if (auto levels = getLevelNamesFromLocalLevels())
+		{
+			int i = 0;
+			for (const auto& name : levels.value())
+			{
+				GameLevel& level = this->levels.emplace_back();
+				level.levelID = i;
+				level.name = name;
+				level.localLevel = true;
+				i++;
+			}
+		}
+	}
+
 	ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {10, 10});
 	if (ImGui::BeginTable("table1", 7,
 						  ImGuiTableFlags_RowBg | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_Resizable |
@@ -114,35 +208,47 @@ void SelectLevelLayer::draw()
 		{
 			for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; ++row)
 			{
-				auto level = &levels[row];
+				auto& level = levels[row];
 
 				ImGui::TableNextRow();
 				ImGui::TableNextColumn();
 
-				ImGui::Text(level->name.c_str());
+				ImGui::Text(level.name.c_str());
 				ImGui::TableNextColumn();
 
-				ImGui::Text(std::to_string(level->downloads).c_str());
+				ImGui::Text(std::to_string(level.downloads).c_str());
 				ImGui::TableNextColumn();
 
-				ImGui::Text(std::to_string(level->likes).c_str());
+				ImGui::Text(std::to_string(level.likes).c_str());
 				ImGui::TableNextColumn();
 
 				ImGui::Text("[View description]");
 				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip(level->description.c_str());
+					ImGui::SetTooltip(level.description.c_str());
 				ImGui::TableNextColumn();
 
-				ImGui::Text(std::to_string(level->stars).c_str());
+				ImGui::Text(std::to_string(level.stars).c_str());
 				ImGui::TableNextColumn();
 
-				ImGui::Text(std::to_string(level->levelID).c_str());
+				ImGui::Text(std::to_string(level.levelID).c_str());
 				ImGui::TableNextColumn();
 
-				if (ImGui::Button(("Open##" + std::to_string(level->levelID)).c_str()))
+				if (ImGui::Button(std::format("Open##{}", level.levelID).c_str()))
 				{
-					std::shared_ptr<GameLayer> gameLayer = GameLayer::create(level->levelID);
-					Application::instance->pushLayer(gameLayer);
+
+					if (level.localLevel)
+					{
+						if (auto lvlstr = getLevelStringFromLocalLevels(level.name))
+						{
+							std::shared_ptr<GameLayer> gameLayer = GameLayer::createWithLevelString(lvlstr.value());
+							Application::instance->pushLayer(gameLayer);
+						}
+					}
+					else
+					{
+						std::shared_ptr<GameLayer> gameLayer = GameLayer::create(level.levelID);
+						Application::instance->pushLayer(gameLayer);
+					}
 				}
 			}
 		}

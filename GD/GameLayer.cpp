@@ -27,7 +27,39 @@ std::shared_ptr<GameLayer> GameLayer::create(int levelID)
 	return nullptr;
 }
 
+std::shared_ptr<GameLayer> GameLayer::createWithLevelString(std::string_view lvlstr)
+{
+	std::shared_ptr<GameLayer> ptr(new GameLayer);
+
+	if (ptr->initWithLevelString(lvlstr))
+		return ptr;
+
+	return nullptr;
+}
+
 bool GameLayer::init(int levelID)
+{
+	if (!initializeMembers())
+		return false;
+
+	loadLevel(std::to_string(levelID));
+
+	replayPlayer.load("Macros\\" + std::to_string(levelID) + ".macro");
+
+	return true;
+}
+
+bool GameLayer::initWithLevelString(std::string_view levelString)
+{
+	if (!initializeMembers())
+		return false;
+
+	loadLevelFromLevelString(levelString);
+
+	return true;
+}
+
+bool GameLayer::initializeMembers()
 {
 	camera = sf::View(sf::FloatRect(-650.f, -950.f, 1920, 1080));
 	//camera.zoom(0.3f);
@@ -38,8 +70,6 @@ bool GameLayer::init(int levelID)
 	framerate.setFont(font);
 	framerate.setCharacterSize(24);
 	framerate.setColor(sf::Color::Green);
-
-	loadLevel(std::to_string(levelID));
 
 	gameSheet01_t3 = Batcher::create("GJ_GameSheet-uhd.png");
 	if (!gameSheet01_t3)
@@ -69,8 +99,6 @@ bool GameLayer::init(int levelID)
 
 	audioEngine = AudioEngine::create();
 
-	std::stringstream ss;
-
 	if (auto gdfolder = PlatformUtils::getGDAppdata(); gdfolder && audioEngine)
 	{
 		if (!audioEngine->loadAudio(gdfolder.value() / std::format("{}.mp3", songID)))
@@ -90,9 +118,6 @@ bool GameLayer::init(int levelID)
 								backgroundSprite->getTextureRect().height / 2.f);
 
 	updateLevelObjects();
-
-	replayPlayer.load("Macros\\" + std::to_string(levelID) + ".macro");
-
 	return true;
 }
 
@@ -361,15 +386,6 @@ void GameLayer::onExit()
 
 void GameLayer::loadLevel(std::string levelId)
 {
-	for (int i = 0; i < 1013; i++)
-	{
-		colorChannels[i] = ColorChannel::create(sf::Color::White, i);
-		groups[i] = Group::create();
-	}
-
-	std::string levelString = "";
-	std::string_view levelStringView = "";
-
 	if (std::stoi(levelId) > 25)
 	{
 		cpr::Session session;
@@ -392,20 +408,26 @@ void GameLayer::loadLevel(std::string levelId)
 				levelResponse.insert({levelSplit[i], levelSplit[i + 1]});
 		}
 
-		levelString = levelResponse["4"];
 		songID = Common::stoi(levelResponse["35"]);
+		auto& lvlstr = levelResponse["4"];
+		loadLevelFromLevelString(GameLevel::decompressLvlStr({lvlstr.begin(), lvlstr.end()}));
 	}
 	else
 	{
 		std::ifstream mainLevelsFile(PlatformUtils::getCustomResource("mainLevels.json"));
 		nlohmann::json mainLevels = nlohmann::json::parse(mainLevelsFile);
-
-		levelString = "H4sIAAAAAAAAA" + mainLevels[levelId].get<std::string>();
+		std::string lvlstr = "H4sIAAAAAAAAA" + mainLevels[levelId].get<std::string>();
+		loadLevelFromLevelString(GameLevel::decompressLvlStr(lvlstr));
 	}
+}
 
-	levelString = GameLevel::decompressLvlStr(levelString);
-
-	levelStringView = levelString;
+void GameLayer::loadLevelFromLevelString(std::string_view levelStringView)
+{
+	for (int i = 0; i < 1013; i++)
+	{
+		colorChannels[i] = ColorChannel::create(sf::Color::White, i);
+		groups[i] = Group::create();
+	}
 
 	setupLevel(levelStringView);
 	setupObjects(levelStringView);
