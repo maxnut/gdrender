@@ -18,7 +18,7 @@
 
 #include <unordered_set>
 #include <unordered_map>
-
+#include <mutex>
 #include <chrono>
 
 class GameLayer : public Layer
@@ -104,10 +104,13 @@ public:
 	bool canStart = false;
 
 	static GameLayer* instance;
+	static std::mutex instanceMutex;
 
 public:
 	static std::shared_ptr<GameLayer> create(int levelID);
 	static std::shared_ptr<GameLayer> createWithLevelString(std::string_view lvlstr);
+	static void lockMutex();
+	static void unlockMutex();
 
 	bool init(int levelID);
 	bool initWithLevelString(std::string_view lvlstr);

@@ -187,6 +187,7 @@ void Sprite::removeFromChannel()
 	channel->channelSprites[parent->section].erase(uniqueID);
 }
 
+//TODO add a mutex to access sprite channels and other shared stuff
 void Sprite::addToChannelSection()
 {
 	if (!channel)

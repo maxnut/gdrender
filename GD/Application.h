@@ -21,11 +21,12 @@ public:
 	int framerate = 240.f;
 
 	bool lockDelta = false;
+	bool loadObjectsMultiThread = false;
 
 	static Application* instance;
 
 public:
-	Application* getInstance();
+	static Application* getInstance();
 
 	void start();
 

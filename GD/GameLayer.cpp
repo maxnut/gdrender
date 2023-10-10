@@ -15,7 +15,12 @@
 
 #include "ReplayPlayer.h"
 
+#include <span>
+#include <utility>
+#include <thread>
+
 GameLayer* GameLayer::instance;
+std::mutex GameLayer::instanceMutex;
 
 std::shared_ptr<GameLayer> GameLayer::create(int levelID)
 {
@@ -35,6 +40,16 @@ std::shared_ptr<GameLayer> GameLayer::createWithLevelString(std::string_view lvl
 		return ptr;
 
 	return nullptr;
+}
+
+void GameLayer::lockMutex()
+{
+	GameLayer::instanceMutex.lock();
+}
+
+void GameLayer::unlockMutex()
+{
+	GameLayer::instanceMutex.unlock();
 }
 
 bool GameLayer::init(int levelID)
@@ -624,6 +639,19 @@ void GameLayer::fillColorChannel(std::span<std::string_view> colorString, int id
 	}
 }
 
+template <typename T> std::pair<std::span<T>, std::span<T>> split_container(const std::span<T>& container)
+{
+	size_t size = container.size();
+	size_t half = size / 2;
+
+	return {container.subspan(0, half), container.subspan(half, size - half)};
+}
+
+void wait()
+{
+	std::this_thread::sleep_for(std::chrono::seconds(2));
+}
+
 void GameLayer::setupObjects(std::string_view levelString)
 {
 	std::vector<std::string_view> objData = Common::splitByDelimStringView(levelString, ';');
@@ -635,18 +663,48 @@ void GameLayer::setupObjects(std::string_view levelString)
 
 	objects.reserve(objData.size());
 
-	for (const std::string_view& objectDataSpecific : objData)
-	{
-		std::shared_ptr<GameObject> obj = GameObject::createFromString(objectDataSpecific);
-		if (obj)
+	auto createObjects = [this](const auto& objdata) {
+		for (const auto& objectDataSpecific : objdata)
 		{
-			objects.push_back(obj);
-			obj->objectIndex = GameLayer::instance->objects.size() - 1;
+			std::shared_ptr<GameObject> obj = GameObject::createFromString(objectDataSpecific);
+			if (obj)
+			{
+				GameLayer::lockMutex();
+				objects.push_back(obj);
+				obj->objectIndex = GameLayer::instance->objects.size() - 1;
+				GameLayer::unlockMutex();
 
-			if (obj->getPosition().x > lastObjXPos)
-				lastObjXPos = obj->getPosition().x;
+				if (obj->getPosition().x > lastObjXPos)
+					lastObjXPos = obj->getPosition().x;
+			}
 		}
+	};
+
+	auto* app = Application::getInstance();
+
+	app->window->setActive(false); //disables rendering completely (need to use this for multiple threads)
+
+	auto now = std::chrono::high_resolution_clock::now();
+	if (app->loadObjectsMultiThread)
+	{
+		auto [first, second] = split_container<std::string_view>(objData);
+
+		std::jthread t1(createObjects, first);
+		std::jthread t2(createObjects, second);
 	}
+	else
+	{
+		createObjects(objData);
+	}
+
+	auto now2 = std::chrono::high_resolution_clock::now();
+	auto lasted = now2 - now;
+
+	std::cout << std::format("creating objects took {} | Multithreading: {}\n",
+							 std::chrono::duration_cast<std::chrono::microseconds>(lasted),
+							 app->loadObjectsMultiThread);
+
+	Application::getInstance()->window->setActive(true);
 }
 
 void GameLayer::updateTriggers()

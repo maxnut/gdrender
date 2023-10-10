@@ -40,19 +40,28 @@ void GameObject::setupCustomObjects(nlohmann::json& objectJson, std::shared_ptr<
 													  sprite["color_type"] == "Detail" &&
 													  objectJson["swap_base_detail"])
 			{
+				GameLayer::lockMutex();
+
 				spr->channel = GameLayer::instance->colorChannels[primaryColorChannel].get();
+				GameLayer::unlockMutex();
+
 				spr->hsvModifier = &primaryHSV;
 				spr->channelType = 1;
 			}
 			else if (sprite["color_type"] == "Detail")
 			{
+				GameLayer::lockMutex();
 				spr->channel = GameLayer::instance->colorChannels[secondaryColorChannel].get();
+				GameLayer::unlockMutex();
+
 				spr->hsvModifier = &secondaryHSV;
 				spr->channelType = 2;
 			}
 			else
 			{
+				GameLayer::lockMutex();
 				spr->channel = GameLayer::instance->colorChannels[1010].get();
+				GameLayer::unlockMutex();
 				spr->channelType = 0;
 			}
 		}
@@ -87,7 +96,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 		return nullptr;
 	}
 
-	nlohmann::json objectEntry = objJson[properties[1]];
+	auto& objectEntry = objJson[properties[1]];
 
 	std::string texture = "emptyFrame.png";
 
@@ -255,6 +264,7 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 		{
 			std::vector<std::string_view> groups = Common::splitByDelimStringView(properties[i + 1], '.');
 			ptr->groups.reserve(groups.size());
+			GameLayer::lockMutex();
 			for (std::string_view groupStr : groups)
 			{
 				int group = Common::stoi(groupStr);
@@ -271,6 +281,8 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 				GameLayer::instance->groups[group]->objectsInSections[ptr->section].insert(
 					{static_cast<int>(ptr->uniqueID), ptr.get()});
 			}
+			GameLayer::unlockMutex();
+
 			break;
 		}
 		case 58:
@@ -320,10 +332,12 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 
 	if (ptr->isTrigger && effectPtr->spawnTriggered && ptr->groups.size() > 0)
 	{
+		GameLayer::lockMutex();
 		for (int i : ptr->groups)
 		{
 			GameLayer::instance->groups[i]->spawnTriggered.push_back(effectPtr.get());
 		}
+		GameLayer::unlockMutex();
 	}
 
 	if (objectEntry.contains("color_type"))
@@ -332,19 +346,26 @@ std::shared_ptr<GameObject> GameObject::createFromString(std::string_view str)
 													   objectEntry["color_type"] == "Detail" &&
 													   objectEntry["swap_base_detail"])
 		{
+			GameLayer::lockMutex();
 			ptr->channel = GameLayer::instance->colorChannels[ptr->primaryColorChannel].get();
+			GameLayer::unlockMutex();
 			ptr->hsvModifier = &ptr->primaryHSV;
 			ptr->channelType = 1;
 		}
 		else if (objectEntry["color_type"] == "Detail")
 		{
+			GameLayer::lockMutex();
 			ptr->channel = GameLayer::instance->colorChannels[ptr->secondaryColorChannel].get();
+			GameLayer::unlockMutex();
+
 			ptr->hsvModifier = &ptr->secondaryHSV;
 			ptr->channelType = 2;
 		}
 		else
 		{
+			GameLayer::lockMutex();
 			ptr->channel = GameLayer::instance->colorChannels[1010].get();
+			GameLayer::unlockMutex();
 			ptr->channelType = 0;
 		}
 	}

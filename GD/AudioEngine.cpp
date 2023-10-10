@@ -30,6 +30,7 @@ bool AudioEngine::init()
 		return true;
 
 	InitAudioDevice();
+	std::cout << "\n\n";
 
 	return IsAudioDeviceReady();
 }

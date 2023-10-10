@@ -187,6 +187,13 @@ void SelectLevelLayer::draw()
 		}
 	}
 
+	ImGui::SameLine();
+	static bool mutlithread = false;
+	if (ImGui::Checkbox("Load objects multi thread (WIP)", &mutlithread))
+	{
+		Application::getInstance()->loadObjectsMultiThread = mutlithread;
+	}
+
 	ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {10, 10});
 	if (ImGui::BeginTable("table1", 7,
 						  ImGuiTableFlags_RowBg | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_Resizable |
@@ -235,7 +242,6 @@ void SelectLevelLayer::draw()
 
 				if (ImGui::Button(std::format("Open##{}", level.levelID).c_str()))
 				{
-
 					if (level.localLevel)
 					{
 						if (auto lvlstr = getLevelStringFromLocalLevels(level.name))
