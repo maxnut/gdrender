@@ -18,7 +18,7 @@ class Batcher;
 class Sprite : public Transformable
 {
 private:
-    glm::vec4 hsvAppliedColor;
+    glm::vec4 hsvAppliedColor = {0, 0, 255, 255};
 public:
 	Vertex vertices[4];
     glm::vec2 originalPositions[4];

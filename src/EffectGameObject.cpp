@@ -1,8 +1,8 @@
 #include "EffectGameObject.h"
-#include "GameLayer.h"
 #include "ActionEasing.h"
+#include "GameLayer.h"
 
-#define gameLayer GameLayer::instance //lol
+#define gameLayer GameLayer::instance // lol
 
 void EffectGameObject::triggerActivated()
 {
@@ -134,8 +134,30 @@ void EffectGameObject::moveAction()
 
 void EffectGameObject::toggleAction()
 {
+	gameLayer->groups[targetGroupId]->enabled = activateGroup;
+
 	for (GameObject* obj : gameLayer->groups[targetGroupId]->objects)
 	{
+		bool disabled = false;
+
+		if (activateGroup)
+		{
+			for (int group : obj->groups)
+			{
+				if (group == targetGroupId)
+					continue;
+
+				if (!gameLayer->groups[group]->enabled)
+				{
+					disabled = true;
+					break;
+				}
+			}
+		}
+
+		if (disabled)
+			continue;
+
 		obj->enabled = activateGroup;
 
 		if (!activateGroup && obj->currentBatcher)
@@ -191,11 +213,12 @@ void EffectGameObject::stopAction()
 
 void EffectGameObject::followAction()
 {
-	std::shared_ptr<FollowAction> followAction = FollowAction::create(duration, targetGroupId, secondaryTargetGroupId, xMod, yMod);
+	std::shared_ptr<FollowAction> followAction =
+		FollowAction::create(duration, targetGroupId, secondaryTargetGroupId, xMod, yMod);
 
-	if(!followAction)
+	if (!followAction)
 		return;
-	
+
 	gameLayer->followActionsActive.push_back(followAction);
 
 	this->triggerAction = followAction;

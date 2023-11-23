@@ -405,12 +405,9 @@ void GameObject::tryUpdateSection()
 		thisSectionMap.erase(this->uniqueID);
 
 		int sectionSize = GameLayer::instance->sectionObjects.size();
-		while (section >= sectionSize)
-		{
-			std::unordered_map<int, GameObject*> map;
-			GameLayer::instance->sectionObjects.push_back(map);
-			sectionSize++;
-		}
+		if(section >= sectionSize)
+			GameLayer::instance->sectionObjects.resize(section + 1);
+
 		GameLayer::instance->sectionObjects[section].insert({this->uniqueID, this});
 
 		this->section = section;
@@ -422,11 +419,6 @@ void GameObject::tryUpdateSection()
 
 			groupMap->erase(uniqueID);
 
-			if (!group->objectsInSections.contains(section))
-			{
-				std::unordered_map<int, GameObject*> map;
-				group->objectsInSections.insert({section, map});
-			}
 			group->objectsInSections[section].insert({static_cast<int>(uniqueID), this});
 		}
 

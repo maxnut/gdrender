@@ -55,6 +55,9 @@ void RotateAction::update(float time)
 
 	rotateLast = rotateAmount;
 
+	if(deltaRotation == 0)
+		return;
+
 	glm::mat4 transform(1.0f);
 
 	if(rotateAround)

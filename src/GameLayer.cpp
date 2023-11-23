@@ -7,6 +7,8 @@
 #include "PlatformUtils.h"
 #include "SelectLevelLayer.h"
 
+#include <algorithm>
+#include <execution>
 #include <cpr/cpr.h>
 #include <deque>
 #include <imgui.h>
@@ -144,16 +146,16 @@ void GameLayer::update()
 	if (canStart && audioEngine && !audioEngine->isPlaying)
 	{
 		audioEngine->setPosition(musicOffset);
-		audioEngine->setVolume(0.55f);
+		audioEngine->setVolume(0.15f);
 		audioEngine->play();
 	}
 
 	if (audioEngine)
 		audioEngine->update();
-	
+
 	frameTimer -= Application::instance->deltaTime;
 
-	if(frameTimer <= 0)
+	if (frameTimer <= 0)
 	{
 		frameTimer = 0.25f;
 		framerate = (int)ImGui::GetIO().Framerate;
@@ -209,13 +211,15 @@ void GameLayer::draw()
 
 void GameLayer::GUI()
 {
-    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
-    ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
-    if (ImGui::Begin("Example: Simple overlay", (bool*)0, window_flags))
-    {
-        ImGui::Text(std::to_string(framerate).c_str());
-    }
-    ImGui::End();
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking |
+									ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings |
+									ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+	ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
+	if (ImGui::Begin("Example: Simple overlay", (bool*)0, window_flags))
+	{
+		ImGui::Text(std::to_string(framerate).c_str());
+	}
+	ImGui::End();
 
 	/* ImGui::Begin("Proprieties");
 
@@ -833,7 +837,7 @@ void GameLayer::fillColorChannel(std::span<std::string_view> colorString, int id
 
 void GameLayer::updateTriggers()
 {
-	float camPos = camera.cameraPos.x - 50.f;
+	float camPos = camera.cameraPos.x;
 
 	int curSection = Common::sectionForPos(camPos);
 
@@ -842,6 +846,7 @@ void GameLayer::updateTriggers()
 		if (i < sectionObjects.size() && i >= 0)
 		{
 			auto& section = sectionObjects[i];
+
 			for (auto& pair : section)
 			{
 				GameObject* obj = pair.second;

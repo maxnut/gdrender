@@ -69,7 +69,7 @@ glm::vec4 HSV::toRGB()
 	case 5:
 		return { v * 255.0f, p * 255.0f, q * 255.0f, 255.f };
 	default:
-		break;
+		return {0, 255, 0, 0};
 	}
 }
 

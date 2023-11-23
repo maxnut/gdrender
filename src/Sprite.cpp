@@ -11,10 +11,7 @@
 void Sprite::updateVerticesPosition(bool send)
 {
 	if (currentBatcher == nullptr)
-	{
-		// std::cout << "No batcher!";
 		return;
-	}
 
 	if (isDirty())
 		updateTransform();
@@ -50,10 +47,7 @@ void Sprite::updateVerticesPosition(bool send)
 void Sprite::sendVertices()
 {
 	if (currentBatcher == nullptr)
-	{
-		// std::cout << "No batcher!";
 		return;
-	}
 
 	for (int i = 0; i < 4; ++i)
 		sendVertex(i);

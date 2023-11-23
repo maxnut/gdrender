@@ -21,6 +21,8 @@ public:
 	std::vector<EffectGameObject*> spawnTriggered;
 
 	std::shared_ptr <ActionInterval> rotateAction = nullptr;
+
+	bool enabled = true;
 public:
 	static std::shared_ptr<Group> create();
 };

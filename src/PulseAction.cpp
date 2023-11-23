@@ -62,8 +62,11 @@ void PulseAction::applyToSpriteIn(Sprite* spr, float fadetime)
 	float r1 = static_cast<float>(to.r - (float)(to.r - channelcolor.r) * (1.f - fadetime));
 	float g1 = static_cast<float>(to.g - (float)(to.g - channelcolor.g) * (1.f - fadetime));
 	float b1 = static_cast<float>(to.b - (float)(to.b - channelcolor.b) * (1.f - fadetime));
-	if (spr->getColor() != to)
-		spr->setColor({r1, g1, b1, 255.f});
+
+	glm::vec4 col = {r1, g1, b1, 255.f};
+
+	if (spr->getColor() != col)
+		spr->setColor(col);
 }
 
 void PulseAction::applyToSpriteOut(Sprite* spr, float fadetime)
@@ -79,8 +82,11 @@ void PulseAction::applyToSpriteOut(Sprite* spr, float fadetime)
 	float r1 = static_cast<float>(to.r - (float)(to.r - channelcolor.r) * (fadetime));
 	float g1 = static_cast<float>(to.g - (float)(to.g - channelcolor.g) * (fadetime));
 	float b1 = static_cast<float>(to.b - (float)(to.b - channelcolor.b) * (fadetime));
-	if (spr->getColor() != to)
-		spr->setColor({r1, g1, b1, 255.f});
+
+	glm::vec4 col = {r1, g1, b1, 255.f};
+
+	if (spr->getColor() != col)
+		spr->setColor(col);
 }
 
 void PulseAction::update(float time)
@@ -141,6 +147,7 @@ void PulseAction::update(float time)
 		else
 			GameLayer::instance->pulsedGroups.insert(target);
 
+		//fade in
 		if (time <= fadein)
 		{
 			float fadetime = time / fadein;
@@ -161,7 +168,7 @@ void PulseAction::update(float time)
 						applyToSpriteIn(spr.get(), fadetime);
 				}
 			}
-		}
+		} //fade out
 		else if (time >= fadein + hold)
 		{
 			float fadetime = (time - hold - fadein) / fadeout;
@@ -181,7 +188,7 @@ void PulseAction::update(float time)
 						applyToSpriteOut(spr.get(), fadetime);
 				}
 			}
-		}
+		} //hold
 		else
 		{
 			std::shared_ptr<Group> group = GameLayer::instance->groups[target];
